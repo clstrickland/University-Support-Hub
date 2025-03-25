@@ -7,6 +7,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Input;
 using H.NotifyIcon;
 
+
 namespace SupportHubApp
 {
     public partial class App : Application
