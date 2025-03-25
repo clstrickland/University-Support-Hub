@@ -1,0 +1,36 @@
+<Page
+    x:Class="SupportHubApp.ReportIssuePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:SupportHubApp"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Padding="20" MinWidth="{Binding ElementName=Root, Path=ActualWidth}" x:Name="MyStackPanel">
+            <TextBlock Text="Report an Issue" FontSize="24" Margin="0,0,0,20"/>
+            <TextBlock x:Name="userInfoTextBlock" Text="Submitting as" FontSize="12" Margin="0,0,0,20" TextWrapping="WrapWholeWords"/>
+
+            <TextBox x:Name="IssueTitleTextBox" PlaceholderText="Issue Title" Margin="0,0,0,10"/>
+            <TextBox x:Name="IssueDescriptionTextBox" PlaceholderText="Describe the issue..." TextWrapping="Wrap" AcceptsReturn="True" MinHeight="200" Margin="0,0,0,10"/>
+            <CheckBox x:Name="AttachScreenshotCheckBox" Content="Attach Screenshot to Ticket" Margin="0,0,0,20"/>
+
+            <ProgressRing x:Name="ProgressRing"  IsActive="False" Visibility="Collapsed"  
+                              HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0"/>
+
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Button x:Name="SubmitIssueButton" Content="Submit" Grid.Column="0" Click="SubmitIssueButton_Click"/>
+                <Button x:Name="CancelIssueButton" Content="Cancel" Grid.Column="2" Click="CancelIssueButton_Click"/>
+            </Grid>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

@@ -1,0 +1,19 @@
+{
+  "profiles": {
+    "SupportHubApp (Unpackaged)": {
+      "commandName": "Project",
+      "commandLineArgs": "slient"
+    },
+    "Background (Package)": {
+      "commandName": "MsixPackage",
+      "commandLineArgs": "/background",
+      "alwaysReinstallApp": false,
+      "doNotLaunchApp": false
+    },
+    "Foreground (Package)": {
+      "commandName": "MsixPackage",
+      "alwaysReinstallApp": false,
+      "doNotLaunchApp": false
+    }
+  }
+}
