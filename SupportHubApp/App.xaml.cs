@@ -13,12 +13,12 @@ namespace SupportHubApp
     public partial class App : Application
     {
         #region Properties
-
         public TaskbarIcon? TrayIcon { get; private set; }
         public Window? Window { get; set; }
         public bool HandleClosedEvents { get; set; } = true;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+        private readonly Logging _logging = new() { subModuleName = "App" };
         #endregion
 
         public App()
@@ -39,19 +39,11 @@ namespace SupportHubApp
 
             if (IpcHelper.CheckProcessRunning(!isBackground))
             {
-                string filePath = "C:\\Users\\CarterStrickland(Adm\\Desktop\\AnotherInstanceRunning.txt";
-                File.WriteAllText(filePath, "Another instance is running.");
+                _logging.LogInfo("Another instance is running.");
                 ExitApp(); // Use the centralized exit method
                 return;
             }
 
-            //if (IpcHelper.IsAnotherInstanceRunning())
-            //{
-            //    string filePath = "C:\\Users\\CarterStrickland(Adm\\Desktop\\AnotherInstanceRunning.txt";
-            //    File.WriteAllText(filePath, "Another instance is running by pipe.");
-            //    ExitApp(); // Use the centralized exit method
-            //    return;
-            //}
             Action activateWindowAction = ActivateMainWindow;
             _ = Task.Run(() => IpcHelper.StartActivationListener(activateWindowAction, _cancellationTokenSource.Token));
             InitializeTrayIcon();
@@ -73,10 +65,6 @@ namespace SupportHubApp
                 args.Handled = true;
                 Window?.Hide();
             }
-            else
-            {
-                //No longer needed as it will handled below.
-            }
         }
         private void InitializeTrayIcon()
         {
@@ -88,6 +76,7 @@ namespace SupportHubApp
 
             TrayIcon = (TaskbarIcon)Resources["TrayIcon"];
             TrayIcon.ForceCreate();
+            _logging.LogInfo("Tray icon initialized.");
         }
 
         private void ShowHideWindowCommand_ExecuteRequested(object? _, ExecuteRequestedEventArgs args)
@@ -97,16 +86,19 @@ namespace SupportHubApp
                 Window = new MainWindow();
                 Window.Closed += MainWindow_Closed; // Use a named handler
                 Window.Activate();
+                _logging.LogInfo("Window created and activated.");
                 return;
             }
 
             if (Window.Visible)
             {
                 Window.Hide();
+                _logging.LogInfo("Window hidden.");
             }
             else
             {
                 Window.Activate();
+                _logging.LogInfo("Window activated.");
             }
         }
 
@@ -161,6 +153,7 @@ namespace SupportHubApp
 
         private void ExitApp()
         {
+            _logging.LogInfo("Exiting application.");
             CleanUp();
             Environment.Exit(0); // Now it's safe to call Environment.Exit
         }

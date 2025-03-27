@@ -22,6 +22,8 @@ namespace SupportHubApp
 {
     public sealed partial class AuthenticationPage : Page
     {
+        private readonly Logging _logging = new() { subModuleName = "Authentication" };
+
         private AuthenticationHelper? _authHelper; // Use the AuthenticationHelper
         public static string? AccessToken { get; private set; } // Static property for token
         public static string? UserName { get; private set; } // Static property for name
@@ -36,6 +38,7 @@ namespace SupportHubApp
 
         private void CancelAuthButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("Authentication canceled by user.");
 
             cts?.Cancel();
 
@@ -65,21 +68,55 @@ namespace SupportHubApp
                 // Successful authentication: Navigate to ReportIssuePage.
                 this.Frame.Navigate(typeof(ReportIssuePage));
             }
-            catch (Exception ex)
+            catch (AuthenticationExceptions.AuthCancelled)
             {
+                _logging.LogInfo("Authentication canceled by user via WAM dialog.");
+                this.Frame.GoBack();
 
-                //if type is System.OperationCanceledException, ignore
-                if (ex is System.OperationCanceledException)
-                {
-                    return;
-                }
-                // Authentication failed:  Show an error message (and *don't* navigate).
-                // You should handle this more gracefully, perhaps with a dialog.
+            }
+            catch (AuthenticationExceptions.AccessDenied)
+            {
+                _logging.LogWarning("Access denied.");
                 progressRing.IsActive = false; // Stop the ProgressRing
                 var errorDialog = new ContentDialog
                 {
                     Title = "Authentication Failed",
-                    Content = $"Could not authenticate: {ex.Message}",
+                    Content = $"Could not authenticate: Access to Self-Service Ticket Submission System is denied.",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+
+                // Go back to home page
+                this.Frame.GoBack();
+            }
+            catch (AuthenticationExceptions.ResponseMalformed)
+            {
+                _logging.LogWarning("Access denied.");
+                progressRing.IsActive = false; // Stop the ProgressRing
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Authentication Failed",
+                    Content = $"Could not authenticate: Authentication Response Invalid",
+                    CloseButtonText = "OK",
+                    XamlRoot = this.XamlRoot
+                };
+                await errorDialog.ShowAsync();
+
+                // Go back to home page
+                this.Frame.GoBack();
+            }
+            catch (Exception ex)
+            {
+
+                // Authentication failed:  Show an error message (and *don't* navigate).
+                // You should handle this more gracefully, perhaps with a dialog.
+                _logging.LogException(ex);
+                progressRing.IsActive = false; // Stop the ProgressRing
+                var errorDialog = new ContentDialog
+                {
+                    Title = "Authentication Failed",
+                    Content = $"Could not authenticate. Please contact support.",
                     CloseButtonText = "OK",
                     XamlRoot = this.XamlRoot
                 };

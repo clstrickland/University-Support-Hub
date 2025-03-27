@@ -6,13 +6,7 @@ using WinRT.Interop;
 using Microsoft.UI;
 using Windows.Graphics;
 //using Microsoft.UI.Xaml.Controls;
-using Microsoft.Identity.Client;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.Identity.Client.Broker;
 using Microsoft.UI.Xaml.Navigation;
-using System.Threading;
 //using System.Windows;
 
 namespace SupportHubApp
@@ -25,6 +19,7 @@ namespace SupportHubApp
         private int _initialX;
         private int _initialY;
         private AppWindow? _appWindow;
+        private readonly Logging _logging = new() { subModuleName = "MainWindow" };
         public MainWindow()
         {
             this.InitializeComponent();
@@ -79,12 +74,14 @@ namespace SupportHubApp
             _initialY = (int)Math.Round((double)(workArea.Y + workArea.Height - height - 10));
 
             _appWindow?.MoveAndResize(new RectInt32(_initialX, _initialY, width, height));
+            _logging.LogInfo("MainWindow initialized.");
         }
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {
             if (e.Content is ReportIssuePage reportIssuePage)
             {
+                _logging.LogInfo("Resizing window for Report Issue Page");
                 // Enable vertical resizing.  
                 var presenter = _appWindow?.Presenter as CompactOverlayPresenter;
                 //if (presenter != null)
@@ -134,6 +131,7 @@ namespace SupportHubApp
                 }));
             } else
             {
+                _logging.LogInfo("Resizing window for non-report issue page");
                 var windowId = Win32Interop.GetWindowIdFromWindow(_hwnd);
                 var displayArea = DisplayArea.GetFromWindowId(windowId, DisplayAreaFallback.Primary);
                 var workArea = displayArea.WorkArea;
@@ -185,81 +183,6 @@ namespace SupportHubApp
         //private static extern int SetWindowLong(IntPtr hWnd, int nIndex, int dwNewLong);
         // --- End P/Invoke Declarations ---
 
-    }
-    public class AuthenticationHelper(Window parentWindow)
-    {
-
-        // Add CancellationToken parameter
-        public async Task<(string AccessToken, string Name, string Email)> GetAccessTokenAsync(CancellationToken cancellationToken)
-        {
-            var scopes = new[] { "openid", "api://42c1dd1d-4e40-4776-aa9d-a8c494f9aabb/Tickets.Create" };
-
-            BrokerOptions options = new(BrokerOptions.OperatingSystems.Windows)
-            {
-                Title = "Self-Service Ticket Submission Tool"
-            };
-
-            IPublicClientApplication app =
-                PublicClientApplicationBuilder.Create("ecf53a39-bddf-4b61-8dfc-a58cf9ac0c22")
-                .WithDefaultRedirectUri()
-                .WithParentActivityOrWindow(() => WindowNative.GetWindowHandle(parentWindow)) // Use _parentWindow
-                .WithBroker(options)
-                .WithAuthority("https://login.microsoftonline.com/68f381e3-46da-47b9-ba57-6f322b8f0da1/v2.0")
-                .Build();
-
-            AuthenticationResult? result = null;
-
-            IEnumerable<IAccount> accounts = await app.GetAccountsAsync();
-            try
-            {
-                IAccount? existingAccount = accounts.FirstOrDefault();
-                if (existingAccount != null)
-                {
-                    // Pass cancellationToken to AcquireTokenSilent
-                    result = await app.AcquireTokenSilent(scopes, existingAccount)
-                                      .WithForceRefresh(true)
-                                      .ExecuteAsync(cancellationToken); // Pass token here
-                }
-                else
-                {
-                    // Pass cancellationToken to AcquireTokenSilent
-                    result = await app.AcquireTokenSilent(scopes, PublicClientApplication.OperatingSystemAccount)
-                                      .WithForceRefresh(true)
-                                      .ExecuteAsync(cancellationToken); // Pass token here
-                }
-            }
-            catch (MsalUiRequiredException)
-            {
-                // Pass cancellationToken to AcquireTokenInteractive
-                result = await app.AcquireTokenInteractive(scopes)
-                                  .ExecuteAsync(cancellationToken); // Pass token here
-            }
-            catch (MsalException ex) when (ex.ErrorCode == "access_denied") //common exception
-            {
-                throw new Exception("Access denied.");
-            }
-            catch (OperationCanceledException)
-            {
-                // Handle cancellation gracefully (e.g., log, return a specific value)
-                Console.WriteLine("Authentication was canceled.");
-                throw new Exception("Authentication was canceled.");
-            }
-
-
-            // Check for cancellation *before* processing the result
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var claims = result.ClaimsPrincipal.Claims;
-            string? name = claims.FirstOrDefault(c => c.Type == "name")?.Value;
-            string? email = claims.FirstOrDefault(c => c.Type == "email" || c.Type == "preferred_username")?.Value; // Check both claim types
-
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(email))
-            {
-                throw new Exception("Name and/or email attributes missing from token");
-            }
-
-            return (result.AccessToken, name, email);
-        }
     }
 
 }

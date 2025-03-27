@@ -9,6 +9,8 @@ namespace SupportHubApp
 {
     public sealed partial class HomePage : Page
     {
+
+        private readonly Logging _logging = new() { subModuleName = "HomePage" };
         public HomePage()
         {
             this.InitializeComponent();
@@ -23,12 +25,14 @@ namespace SupportHubApp
         private async void CheckForUpdateButton_Click(object sender, RoutedEventArgs e)
         {
             // Simulate checking for an update (replace with your actual update logic)
+            _logging.LogInfo("User clicked the Check for Updates button");
             await Windows.System.Launcher.LaunchUriAsync(new Uri("ms-settings:windowsupdate"));
             CloseCurrentWindow();
         }
 
         private void ReportIssueButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("User clicked the Report Issue button.");
             // Navigate to the ReportIssuePage.
             this.Frame.Navigate(typeof(AuthenticationPage), Window.Current); //Pass current window
 
@@ -36,6 +40,7 @@ namespace SupportHubApp
 
         private async void OpenAppStoreButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("User clicked the Open App Store button.");
             await Launcher.LaunchUriAsync(new Uri("companyportal://portal.manage.microsoft.com/apps/"));
             CloseCurrentWindow();
         }
@@ -48,14 +53,5 @@ namespace SupportHubApp
             progress1.IsActive = false;
         }
 
-        private async Task SimulateLoading()
-        {
-            // Show the ProgressRing and hide the icon.
-            VisualStateManager.GoToState(this, "LoadingState", true);
-            progress1.IsActive = true;
-            await Task.Delay(3000); // Simulate a 3-second delay
-            progress1.IsActive = false;
-            VisualStateManager.GoToState(this, "IdleState", false);
-        }
     }
 }
