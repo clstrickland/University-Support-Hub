@@ -14,18 +14,19 @@
     <Configurations>Debug;Release;Release No Opt</Configurations>
   </PropertyGroup>
   <ItemGroup>
-    <Content Remove="Assets\BadgeLogo.scale-100.png" />
-    <Content Remove="Assets\BadgeLogo.scale-200.png" />
-    <Content Remove="Assets\BadgeLogo.scale-400.png" />
     <Content Remove="Assets\Font Awesome 6 Brands-Regular-400.otf" />
     <Content Remove="Assets\Font Awesome 6 Free-Regular-400.otf" />
     <Content Remove="Assets\Font Awesome 6 Free-Solid-900.otf" />
-    <Content Remove="Assets\SplashScreen.scale-400.png" />
-    <Content Remove="Assets\StoreLogo.scale-100.png" />
-    <Content Remove="Assets\StoreLogo.scale-200.png" />
-    <Content Remove="Assets\StoreLogo.scale-400.png" />
   </ItemGroup>
   <ItemGroup>
+    <None Remove="Assets\BadgeLogo.scale-100.png" />
+    <None Remove="Assets\BadgeLogo.scale-200.png" />
+    <None Remove="Assets\BadgeLogo.scale-400.png" />
+    <None Remove="Assets\life-ring.ico" />
+    <None Remove="Assets\SplashScreen.scale-400.png" />
+    <None Remove="Assets\StoreLogo.scale-100.png" />
+    <None Remove="Assets\StoreLogo.scale-200.png" />
+    <None Remove="Assets\StoreLogo.scale-400.png" />
     <None Remove="Assets\TAM-MaroonBox.png" />
     <None Remove="Assets\tray.ico" />
     <None Remove="AuthenticationPage.xaml" />
@@ -108,8 +109,23 @@
     <AppxBundle>Auto</AppxBundle>
     <AppxBundlePlatforms>x64</AppxBundlePlatforms>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-    <ApplicationIcon>Assets\tray.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\life-ring.ico</ApplicationIcon>
     <WindowsPackageType>MSIX</WindowsPackageType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\WindowsAppSDK-VersionInfo.cs" />
+  </ItemGroup>
 </Project>

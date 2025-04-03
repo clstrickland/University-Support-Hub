@@ -30,16 +30,21 @@ namespace SupportHubApp
         private readonly IntPtr _hwnd = hwnd;
         private readonly CanvasDevice _canvasDevice = new(); // Use CanvasDevice
 
+        private readonly Logging _logging = new() { SubModuleName = "ScreenshotHelper" };
+
         // No longer needed! Win2D handles this.
         // private IDirect3DDevice CreateDirect3DDevice() { ... }
 
         private static IDirect3DDevice Device =>
             // Get the underlying IDirect3DDevice from the CanvasDevice
             CanvasDevice.GetSharedDevice();
-        private static async Task<byte[]> CaptureItemAsync(GraphicsCaptureItem item, TimeSpan timeout)
+        private async Task<byte[]> CaptureItemAsync(GraphicsCaptureItem item, TimeSpan timeout)
         {
+            _logging.LogInfo("Starting screen capture...");
+
             if (item == null)
             {
+                _logging.LogError("GraphicsCaptureItem is null.");
                 throw new ArgumentNullException(nameof(item), "GraphicsCaptureItem cannot be null.");
             }
 
@@ -69,11 +74,12 @@ namespace SupportHubApp
                     try
                     {
                         frameCount++;
-                        Debug.WriteLine($"Frame arrived: {frameCount}");
+                        _logging.LogInfo($"Frame {frameCount} arrived.");
 
                         using var frame = s.TryGetNextFrame();
                         if (frame != null)
                         {
+                            _logging.LogInfo($"Frame {frameCount} captured.");
                             using var bitmap = CanvasBitmap.CreateFromDirect3D11Surface(CanvasDevice.GetSharedDevice(), frame.Surface);
                             using var stream = new InMemoryRandomAccessStream();
                             bitmap.SaveAsync(stream, CanvasBitmapFileFormat.Png).AsTask(cts.Token).Wait(cts.Token);
@@ -85,35 +91,36 @@ namespace SupportHubApp
                         }
                         else
                         {
-                            Debug.WriteLine("Null frame received.");
+                            _logging.LogError($"Frame {frameCount} is null.");
                         }
                     }
                     catch (OperationCanceledException)
                     {
-                        // Expected.
+                        _logging.LogWarning($"Frame {frameCount} capture canceled.");
                     }
                     catch (Exception ex)
                     {
+                        _logging.LogException(ex);
                         tcs.TrySetException(ex);
                     }
                 };
 
                 // Start the capture SYNCHRONOUSLY *before* waiting on the task.
                 session.StartCapture();
-                Debug.WriteLine("Capture started (synchronously).");
+                _logging.LogInfo("Capture session started.");
 
 
                 return await tcs.Task;
             }
             catch (OperationCanceledException)
             {
-                Debug.WriteLine($"Capture timed out after {frameCount} frames.");
+                _logging.LogInfo($"Capture timed out after {frameCount} frames.");
                 throw new TimeoutException("Screen capture timed out.", new OperationCanceledException());
             }
             catch (Exception ex)
             {
                 // Log the exception for debugging.
-                Debug.WriteLine($"Capture failed: {ex}");
+                _logging.LogException(ex);
                 tcs.TrySetException(ex); // Ensure exception is propagated.
                 throw; // Re-throw the exception after logging.
             }
@@ -127,6 +134,7 @@ namespace SupportHubApp
         }
         public async Task<byte[]> CaptureWithPickerAsync()
         {
+            _logging.LogInfo("Starting screen capture with picker...");
             var picker = new GraphicsCapturePicker();
             var initializeWithWindow = picker.As<IInitializeWithWindow>();
             initializeWithWindow.Initialize(_hwnd);

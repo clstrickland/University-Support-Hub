@@ -22,7 +22,7 @@ namespace SupportHubApp
 {
     public sealed partial class AuthenticationPage : Page
     {
-        private readonly Logging _logging = new() { subModuleName = "Authentication" };
+        private readonly Logging _logging = new() { SubModuleName = "Authentication" };
 
         private AuthenticationHelper? _authHelper; // Use the AuthenticationHelper
         public static string? AccessToken { get; private set; } // Static property for token

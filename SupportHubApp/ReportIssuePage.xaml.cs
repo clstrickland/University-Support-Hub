@@ -51,6 +51,7 @@ namespace SupportHubApp
         private IntPtr _hwnd;
         readonly ContentDialog errorDialog = new();
         private DispatcherQueue? _dispatcherQueue; // Store the DispatcherQueue
+        private readonly Logging _logging = new() { SubModuleName = "ReportIssuePage" };
 
 
 
@@ -69,6 +70,7 @@ namespace SupportHubApp
             // Check for capture support.
             if (!GraphicsCaptureSession.IsSupported())
             {
+                _logging.LogWarning("Graphics Capture was reported as unsupported.");
                 AttachScreenshotCheckBox.Visibility = Visibility.Collapsed;
             }
         }
@@ -85,15 +87,12 @@ namespace SupportHubApp
                 _dispatcherQueue = this.DispatcherQueue; // Or window.DispatcherQueue, any UI element's DispatcherQueue
 
             }
-            else
-            {
-                //Handle the window being null,
-            }
         }
 
 
         private async void CancelIssueButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("Cancel button was clicked");
             // ... (No changes here, same as previous response) ...
             var errorDialog = new ContentDialog
             {
@@ -107,10 +106,13 @@ namespace SupportHubApp
 
             if (result == ContentDialogResult.Primary)
             {
+                // User clicked "Go Back", do nothing and return.
+                _logging.LogInfo("User clicked Go Back on Cancel Confirmation dialog");
                 return; // Stop processing if user wants to go back
             }
             else
             {
+                _logging.LogInfo("User clicked Cancel Ticket on Cancel Confirmation dialog");
                 // Navigate back to HomePage.
                 this.Frame.Navigate(typeof(HomePage), Window.Current); //Pass current window
 
@@ -122,6 +124,7 @@ namespace SupportHubApp
 
         private async void SubmitIssueButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("Submit button was clicked");
             // Get the issue details.
             string? issueTitle = IssueTitleTextBox.Text;
             string? issueDescription = IssueDescriptionTextBox.Text;
@@ -131,6 +134,15 @@ namespace SupportHubApp
             // Input validation (same as before)
             if (string.IsNullOrWhiteSpace(issueTitle) || string.IsNullOrWhiteSpace(issueDescription))
             {
+                _logging.LogWarning("Following validation errors:");
+                if (string.IsNullOrWhiteSpace(issueTitle))
+                {
+                    _logging.LogWarning("Issue title is empty.");
+                }
+                if (string.IsNullOrWhiteSpace(issueDescription))
+                {
+                    _logging.LogWarning("Issue description is empty.");
+                }
                 var errorDialog = new ContentDialog
                 {
                     Title = "Missing Information",
@@ -149,6 +161,7 @@ namespace SupportHubApp
 
             if (attachScreenshot)
             {
+                _logging.LogInfo("User selected to attach a screenshot. Starting capture process.");
                 var window = (Application.Current as App)?.Window;
                 //window.Hide();
                 //var pickerWindow = new Window();
@@ -198,27 +211,31 @@ namespace SupportHubApp
                 errorDialog.XamlRoot = this.Content.XamlRoot;
                 if (accessToken == null)
                 {
+                    _logging.LogError("Access token is null. Cannot submit ticket.");
                     // raise an exception
                     throw new Exception("Missing accessToken");
                 }
                 TicketManager? ticketManager = new("http://10.119.40.135:7071/api", accessToken);
+                _logging.LogInfo("Invoking ticket creation.");
                 string instanceId = await ticketManager.CreateTicketAsync(issueTitle, issueDescription, screenshotBytes, errorDialog);
 
 
                 this.Frame.Navigate(typeof(TicketSubmittedPage));
 
                 // Start polling in the background
+                _logging.LogInfo("Starting polling for ticket status.");
                 _ = Task.Run(async () =>
                 {
                     string? status;
                     string? ticketId;
                     (status, ticketId) = await ticketManager.PollForStatusAsync(instanceId, errorDialog);
-
                     // Use DispatcherQueue to update UI elements
                     _dispatcherQueue?.TryEnqueue(
                           DispatcherQueuePriority.Normal,
                            () =>
                            {
+                               _logging.LogInfo("Polling completed. Updating UI.");
+
                                var toastXml = ToastNotificationManager.GetTemplateContent(ToastTemplateType.ToastText02);
 
                                // Modify the toast XML to support actions (buttons).  ToastText02 doesn't support them by default.
@@ -230,6 +247,7 @@ namespace SupportHubApp
 
                                if (status == "success")
                                {
+                                   _logging.LogInfo("Ticket created successfully.");
                                    toastTextElements[1].AppendChild(toastXml.CreateTextNode($"Ticket #{ticketId} was created successfully"));
 
                                    // Add a "go to ticket" button that goes to a URL.
@@ -253,10 +271,12 @@ namespace SupportHubApp
                                }
                                else if (ticketId != "")
                                {
+                                   _logging.LogError($"Ticket creation failed. Status: {status}");
                                    toastTextElements[1].AppendChild(toastXml.CreateTextNode($"There was an issue creating your ticket\nError: {status}\nTicket ID: {ticketId}"));
                                }
                                else
                                {
+                                   _logging.LogError($"Ticket creation failed. Status: {status}");
                                    toastTextElements[1].AppendChild(toastXml.CreateTextNode($"There was an issue creating your ticket\nError: {status}"));
                                }
 
@@ -269,6 +289,7 @@ namespace SupportHubApp
 
             catch (Exception ex)
             {
+                _logging.LogException(ex);
                 // ... (Error handling, same as before) ...
                 var errorDialog = new ContentDialog
                 {

@@ -12,6 +12,7 @@ namespace SupportHubApp
 {
     public sealed partial class TicketSubmittedPage : Page
     {
+        private readonly Logging _logging = new() { SubModuleName = "TicketSubmittedPage" };
         //private string _ticketId;
         //private CancellationTokenSource _cancellationTokenSource;
 
@@ -46,6 +47,7 @@ namespace SupportHubApp
 
         private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
+            _logging.LogInfo("User clicked the Close button.");
             // Navigate back to HomePage.
             this.Frame.Navigate(typeof(HomePage), Window.Current); //Pass current window
 

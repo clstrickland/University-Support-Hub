@@ -18,7 +18,7 @@ namespace SupportHubApp
         public bool HandleClosedEvents { get; set; } = true;
         private readonly CancellationTokenSource _cancellationTokenSource = new();
 
-        private readonly Logging _logging = new() { subModuleName = "App" };
+        private readonly Logging _logging = new() { SubModuleName = "App" };
         #endregion
 
         public App()
@@ -34,6 +34,7 @@ namespace SupportHubApp
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
+            _logging.LogInfo($"--- Instance Start at {DateTime.Now} ---");
             string[] arguments = Environment.GetCommandLineArgs();
             bool isBackground = arguments.Contains("/background");
 

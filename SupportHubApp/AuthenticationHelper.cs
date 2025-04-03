@@ -64,7 +64,7 @@ namespace SupportHubApp
     public class AuthenticationHelper(Window parentWindow)
     {
 
-        private readonly Logging _logging = new() { subModuleName = "AuthenticationHelper" };
+        private readonly Logging _logging = new() { SubModuleName = "AuthenticationHelper" };
 
         // Add CancellationToken parameter
         public async Task<(string AccessToken, string Name, string Email)> GetAccessTokenAsync(CancellationToken cancellationToken)

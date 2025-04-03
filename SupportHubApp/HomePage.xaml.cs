@@ -10,7 +10,7 @@ namespace SupportHubApp
     public sealed partial class HomePage : Page
     {
 
-        private readonly Logging _logging = new() { subModuleName = "HomePage" };
+        private readonly Logging _logging = new() { SubModuleName = "HomePage" };
         public HomePage()
         {
             this.InitializeComponent();

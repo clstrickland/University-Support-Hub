@@ -19,7 +19,7 @@ namespace SupportHubApp
         private int _initialX;
         private int _initialY;
         private AppWindow? _appWindow;
-        private readonly Logging _logging = new() { subModuleName = "MainWindow" };
+        private readonly Logging _logging = new() { SubModuleName = "MainWindow" };
         public MainWindow()
         {
             this.InitializeComponent();
