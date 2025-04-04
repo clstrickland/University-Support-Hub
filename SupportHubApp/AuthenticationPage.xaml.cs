@@ -13,6 +13,7 @@ using Microsoft.UI.Xaml.Controls;
 //using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using System.Threading;
+//using System.Windows;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,9 +32,15 @@ namespace SupportHubApp
 
         private CancellationTokenSource? cts;
 
+        private MainWindow? _mainWindow;
+
+        readonly Windows.ApplicationModel.Resources.ResourceLoader _resourceLoader;
+
         public AuthenticationPage()
         {
             this.InitializeComponent();
+            _resourceLoader = ((Application.Current as App)?._resourceLoader) ?? throw new InvalidOperationException("App instance not found.");
+
         }
 
         private void CancelAuthButton_Click(object sender, RoutedEventArgs e)
@@ -58,6 +65,9 @@ namespace SupportHubApp
             // Initialize AuthenticationHelper with the parent window.
             var window = ((Application.Current as App)?.Window) ?? throw new InvalidOperationException("Window not found.");
             _authHelper = new AuthenticationHelper(window);
+            _mainWindow = (window as MainWindow) ?? throw new InvalidOperationException("Unable to get window as MainWindow instance");
+
+
 
 
             try
@@ -78,30 +88,38 @@ namespace SupportHubApp
             {
                 _logging.LogWarning("Access denied.");
                 progressRing.IsActive = false; // Stop the ProgressRing
-                var errorDialog = new ContentDialog
+
+                string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
+                string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/AccessDeniedMessage");
+                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                if (_mainWindow != null)
                 {
-                    Title = "Authentication Failed",
-                    Content = $"Could not authenticate: Access to Self-Service Ticket Submission System is denied.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                    ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                }
+                else
+                {
+                    _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                }
 
                 // Go back to home page
                 this.Frame.GoBack();
             }
             catch (AuthenticationExceptions.ResponseMalformed)
             {
-                _logging.LogWarning("Access denied.");
+                _logging.LogError("Malformed response from authentication.");
                 progressRing.IsActive = false; // Stop the ProgressRing
-                var errorDialog = new ContentDialog
+
+                string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
+                string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/UnknownErrorMessage");
+                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                if (_mainWindow != null)
                 {
-                    Title = "Authentication Failed",
-                    Content = $"Could not authenticate: Authentication Response Invalid",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                    ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                }
+                else
+                {
+                    _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                }
 
                 // Go back to home page
                 this.Frame.GoBack();
@@ -113,14 +131,19 @@ namespace SupportHubApp
                 // You should handle this more gracefully, perhaps with a dialog.
                 _logging.LogException(ex);
                 progressRing.IsActive = false; // Stop the ProgressRing
-                var errorDialog = new ContentDialog
+
+
+                string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
+                string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/UnknownErrorMessage");
+                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                if (_mainWindow != null)
                 {
-                    Title = "Authentication Failed",
-                    Content = $"Could not authenticate. Please contact support.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                    await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                }
+                else
+                {
+                    _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                }
 
                 // Go back to home page
                 this.Frame.GoBack();

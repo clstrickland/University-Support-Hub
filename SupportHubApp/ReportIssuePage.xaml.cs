@@ -26,7 +26,8 @@ using WinRT.Interop;
 //using H.NotifyIcon;
 //using Windows.Data.Xml.Dom;  // Add this using
 using Windows.UI.Notifications;  // Add this using
-using Microsoft.UI.Dispatching; // Add this for DispatcherQueue
+using Microsoft.UI.Dispatching;
+using System.Configuration; // Add this for DispatcherQueue
 
 
 namespace SupportHubApp
@@ -49,9 +50,12 @@ namespace SupportHubApp
         //private CoreWindow _compactOverlayCoreWindow;
         //private int _compactOverlayViewId;
         private IntPtr _hwnd;
-        readonly ContentDialog errorDialog = new();
+        //readonly ContentDialog errorDialog = new();
         private DispatcherQueue? _dispatcherQueue; // Store the DispatcherQueue
         private readonly Logging _logging = new() { SubModuleName = "ReportIssuePage" };
+        private Window? _window;
+        private MainWindow? _mainWindow;
+        readonly Windows.ApplicationModel.Resources.ResourceLoader _resourceLoader;
 
 
 
@@ -59,33 +63,45 @@ namespace SupportHubApp
         {
             this.InitializeComponent();
             this.Loaded += ReportIssuePage_Loaded; // Use the Loaded event
+            _resourceLoader = ((Application.Current as App)?._resourceLoader) ?? throw new InvalidOperationException("App instance not found.");
 
 
 
-            // Get user info.
-            string? name = AuthenticationPage.UserName;  // Assuming these are static
-            string? email = AuthenticationPage.Email;
-            userInfoTextBlock.Text = $"Submitting as {name} ({email})";
 
-            // Check for capture support.
-            if (!GraphicsCaptureSession.IsSupported())
-            {
-                _logging.LogWarning("Graphics Capture was reported as unsupported.");
-                AttachScreenshotCheckBox.Visibility = Visibility.Collapsed;
-            }
         }
 
         private void ReportIssuePage_Loaded(object sender, RoutedEventArgs e)
         {
-            var window = (Application.Current as App)?.Window; //Replace 'App' by the class name of your Application.
-                                                               //OR, if the XAML root is available:
+            _window = (Application.Current as App)?.Window; //Replace 'App' by the class name of your Application.
+                                                            //OR, if the XAML root is available:
 
-            if (window != null)  //Always check!
+            _mainWindow = (_window as MainWindow) ?? throw new InvalidOperationException("Unable to get window as MainWindow instance");
+            
+            
+
+
+
+
+
+            if (_window != null)  //Always check!
             {
-                _hwnd = WindowNative.GetWindowHandle(window);
+
+                _hwnd = WindowNative.GetWindowHandle(_window);
                 // Now you can use _hwnd in your ScreenshotHelper
                 _dispatcherQueue = this.DispatcherQueue; // Or window.DispatcherQueue, any UI element's DispatcherQueue
 
+                // Get user info.
+                string? name = AuthenticationPage.UserName;  // Assuming these are static
+                string? email = AuthenticationPage.Email;
+                var prefix = _resourceLoader.GetString("ReportIssue/UserInfoPrefix/Text");
+                userInfoTextBlock.Text = $"{prefix} {name} ({email})";
+
+                // Check for capture support.
+                if (!GraphicsCaptureSession.IsSupported())
+                {
+                    _logging.LogWarning("Graphics Capture was reported as unsupported.");
+                    AttachScreenshotCheckBox.Visibility = Visibility.Collapsed;
+                }
             }
         }
 
@@ -93,32 +109,29 @@ namespace SupportHubApp
         private async void CancelIssueButton_Click(object sender, RoutedEventArgs e)
         {
             _logging.LogInfo("Cancel button was clicked");
-            // ... (No changes here, same as previous response) ...
-            var errorDialog = new ContentDialog
+            string Title = _resourceLoader.GetString("ReportIssue/CancelDialog/Title");
+            string Content = _resourceLoader.GetString("ReportIssue/CancelDialog/Content");
+            string PrimaryButtonText = _resourceLoader.GetString("ReportIssue/CancelDialog/PrimaryButtonText");
+            string CloseButtonText = _resourceLoader.GetString("ReportIssue/CancelDialog/CloseButtonText");
+            if (_mainWindow != null)
             {
-                Title = "Cancel Submission?",
-                Content = "Do you want to close without sending the ticket?",
-                PrimaryButtonText = "Go Back",
-                CloseButtonText = "Cancel Ticket",
-                XamlRoot = this.XamlRoot
-            };
-            ContentDialogResult? result = await errorDialog.ShowAsync();
+                ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText, CloseButtonText);
 
-            if (result == ContentDialogResult.Primary)
-            {
-                // User clicked "Go Back", do nothing and return.
-                _logging.LogInfo("User clicked Go Back on Cancel Confirmation dialog");
-                return; // Stop processing if user wants to go back
+
+                if (result == ContentDialogResult.Primary)
+                {
+                    _logging.LogInfo("User clicked Go Back on Cancel Confirmation dialog");
+                    return;
+                }
+                else
+                {
+                    _logging.LogInfo("User clicked Cancel Ticket on Cancel Confirmation dialog");
+                    this.Frame.Navigate(typeof(HomePage), Window.Current);
+                }
             }
             else
             {
-                _logging.LogInfo("User clicked Cancel Ticket on Cancel Confirmation dialog");
-                // Navigate back to HomePage.
-                this.Frame.Navigate(typeof(HomePage), Window.Current); //Pass current window
-
-                // Close the current window.
-                var window = (Application.Current as App)?.Window;
-                window?.Close();
+                _logging.LogError("MainWindow instance is null. Cannot show alert.");
             }
         }
 
@@ -143,19 +156,22 @@ namespace SupportHubApp
                 {
                     _logging.LogWarning("Issue description is empty.");
                 }
-                var errorDialog = new ContentDialog
+
+                string Title = _resourceLoader.GetString("ReportIssue/ValidationDialog/Title");
+                string Content = _resourceLoader.GetString("ReportIssue/ValidationDialog/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                if (_mainWindow != null)
                 {
-                    Title = "Missing Information",
-                    Content = "Please enter both an issue title and description.",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                    ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                }
+                else
+                {
+                    _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                }
                 return;
             }
 
-            ProgressRing.IsActive = true;
-            ProgressRing.Visibility = Visibility.Visible;
+
 
             byte[]? screenshotBytes = null;
 
@@ -171,12 +187,36 @@ namespace SupportHubApp
 
                 // Capture a screenshot.
                 var helper = new ScreenshotHelper(_hwnd);
-                screenshotBytes = await helper.CaptureWithPickerAsync();
+                try
+                {
+                    screenshotBytes = await helper.CaptureWithPickerAsync();
+                }
+                catch (ArgumentNullException)
+                {
+                    // the user probably cancelled out of the picker
+                    _logging.LogWarning("Screenshot capture was cancelled by the user.");
+
+                    string Title = _resourceLoader.GetString("ReportIssue/NoScreenshotDialog/Title");
+                    string Content = _resourceLoader.GetString("ReportIssue/NoScreenshotDialog/Content");
+                    string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                    if (_mainWindow != null)
+                    {
+                        ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                    }
+                    else
+                    {
+                        _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                    }
+                    return;
+
+                }
+
                 //pickerWindow.Close();
                 //window.Show();
             }
             //CoreWindow idkwindow = CoreWindow.FromAbi(_hwnd);
-
+            ProgressRing.IsActive = true;
+            ProgressRing.Visibility = Visibility.Visible;
 
             //await idkwindow.Dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
             //{
@@ -208,16 +248,28 @@ namespace SupportHubApp
 
             try
             {
-                errorDialog.XamlRoot = this.Content.XamlRoot;
+                //errorDialog.XamlRoot = this.Content.XamlRoot;
                 if (accessToken == null)
                 {
                     _logging.LogError("Access token is null. Cannot submit ticket.");
                     // raise an exception
                     throw new Exception("Missing accessToken");
                 }
-                TicketManager? ticketManager = new("http://10.119.40.135:7071/api", accessToken);
+
+                string? endpoint = ConfigurationManager.AppSettings["TicketSubmissionEndpoint"];
+
+                if (string.IsNullOrWhiteSpace(endpoint))
+                {
+                    _logging.LogError("Ticket Submission Endpoint value from system configuration is invalid.");
+                    throw new Exception("Invalid app configuration. Please contact support.");
+                }
+
+                TicketManager? ticketManager = new(endpoint, accessToken);
                 _logging.LogInfo("Invoking ticket creation.");
-                string instanceId = await ticketManager.CreateTicketAsync(issueTitle, issueDescription, screenshotBytes, errorDialog);
+                // disable cancel button
+                CancelIssueButton.IsEnabled = false;
+                SubmitIssueButton.IsEnabled = false;
+                string instanceId = await ticketManager.CreateTicketAsync(issueTitle, issueDescription, screenshotBytes);
 
 
                 this.Frame.Navigate(typeof(TicketSubmittedPage));
@@ -228,7 +280,7 @@ namespace SupportHubApp
                 {
                     string? status;
                     string? ticketId;
-                    (status, ticketId) = await ticketManager.PollForStatusAsync(instanceId, errorDialog);
+                    (status, ticketId) = await ticketManager.PollForStatusAsync(instanceId);
                     // Use DispatcherQueue to update UI elements
                     _dispatcherQueue?.TryEnqueue(
                           DispatcherQueuePriority.Normal,
@@ -291,19 +343,27 @@ namespace SupportHubApp
             {
                 _logging.LogException(ex);
                 // ... (Error handling, same as before) ...
-                var errorDialog = new ContentDialog
+
+                string Title = _resourceLoader.GetString("ReportIssue/SubmitFailedDialog/Title");
+                string Content = $"{_resourceLoader.GetString("ReportIssue/SubmitFailedDialog/Content")}: {ex.Message}";
+                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                if (_mainWindow != null)
                 {
-                    Title = "Submission Failed",
-                    Content = $"Could not submit the ticket: {ex.Message}",
-                    CloseButtonText = "OK",
-                    XamlRoot = this.XamlRoot
-                };
-                await errorDialog.ShowAsync();
+                    ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
+                }
+                else
+                {
+                    _logging.LogError("MainWindow instance is null. Cannot show alert.");
+                }
+                return;
+
             }
             finally
             {
                 ProgressRing.IsActive = false;
                 ProgressRing.Visibility = Visibility.Collapsed;
+                CancelIssueButton.IsEnabled = true;
+                SubmitIssueButton.IsEnabled = true;
             }
         }
 

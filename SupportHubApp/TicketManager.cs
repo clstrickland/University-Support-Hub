@@ -7,7 +7,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 //using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.UI.Xaml.Controls; // For ContentDialog (error handling)
+//using Microsoft.UI.Xaml.Controls; // For ContentDialog (error handling)
 
 namespace SupportHubApp
 {
@@ -44,15 +44,15 @@ namespace SupportHubApp
         //}
 
 
-        public async Task<string> CreateTicketAsync(string title, string description, byte[]? imageBytes, ContentDialog errorDialog)
+        public async Task<string> CreateTicketAsync(string title, string description, byte[]? imageBytes)
         {
             try
             {
                 using var content = new MultipartFormDataContent
-            {
-                { new StringContent(title), "title" },
-                { new StringContent(description), "description" }
-            };
+                {
+                    { new StringContent(title), "title" },
+                    { new StringContent(description), "description" }
+                };
 
                 if (imageBytes != null)
                 {
@@ -62,7 +62,7 @@ namespace SupportHubApp
                     content.Add(imageContent, "image", "screenshot.png"); // "image" is the field name, "screenshot.png" is a suggested filename
                 }
 
-                HttpResponseMessage? response = await _httpClient.PostAsync($"{_baseUrl}/tickets", content);
+                HttpResponseMessage? response = await _httpClient.PostAsync($"{_baseUrl}/tickets", content); // This and other calls need to start using the CancellationToken param for proper cancel operations
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -78,7 +78,7 @@ namespace SupportHubApp
                         {
                             _logging.LogError("Invalid response format: instance_id is not a string.");
                             // Handle the case where "instance_id" is not a string.
-                            await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
+                            //await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
                             throw new Exception("Invalid response format");
                         }
                         string? instanceId = instanceIdElement.GetString();
@@ -87,7 +87,7 @@ namespace SupportHubApp
                         {
                             _logging.LogError("Invalid response format: instance_id is empty.");
                             // Handle the case where "instance_id" is empty.
-                            await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
+                            //await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
                             throw new Exception("Invalid response format");
                         }
                         else
@@ -100,7 +100,7 @@ namespace SupportHubApp
                         // Handle the case where "instance_id" is not in the response
                         //(even if the request returns 200).
                         _logging.LogError("Invalid response format: missing instance_id.");
-                        await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
+                        //await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
                         throw new Exception("Invalid response format");
                     }
                 }
@@ -109,7 +109,7 @@ namespace SupportHubApp
                     // Handle API errors (e.g., 400 Bad Request, 500 Internal Server Error).
                     string? errorContent = await response.Content.ReadAsStringAsync();
                     _logging.LogError($"API Error: {response.StatusCode} - {errorContent}");
-                    await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
+                    //await ShowErrorDialog(errorDialog, "There was an unexpected response. Please contact support.");
                     throw new Exception("API Error");
                 }
             }
@@ -117,19 +117,19 @@ namespace SupportHubApp
             {
                 _logging.LogException(ex);
                 // Handle network errors (e.g., no internet connection).
-                await ShowErrorDialog(errorDialog, $"Network Error: {ex.Message}");
+                //await ShowErrorDialog(errorDialog, $"Network Error: {ex.Message}");
                 throw new Exception("Network Error");
             }
             catch (Exception ex)
             {
                 _logging.LogException(ex);
                 // Handle unexpected errors
-                await ShowErrorDialog(errorDialog, $"An unexpected error occurred. Please contact support.");
+                //await ShowErrorDialog(errorDialog, $"An unexpected error occurred. Please contact support.");
                 throw new Exception("Unexpected Error");
             }
         }
 
-        public async Task<(string status, string ticketId)> PollForStatusAsync(string instanceId, ContentDialog errorDialog)
+        public async Task<(string status, string ticketId)> PollForStatusAsync(string instanceId)
         {
             string? status = "";
             string? ticketId = "";
@@ -157,7 +157,7 @@ namespace SupportHubApp
                             {
                                 _logging.LogError("Invalid response format: status is not a string.");
                                 // Handle the case where "status" is not a string.
-                                await ShowErrorDialog(errorDialog, "Invalid response format: status is not a string.");
+                                //await ShowErrorDialog(errorDialog, "Invalid response format: status is not a string.");
                                 throw new Exception("Invalid response format");
                             }
                             status = statusElement.GetString(); // Return the status
@@ -171,7 +171,7 @@ namespace SupportHubApp
                             {
                                 _logging.LogError("Invalid response format: ticket_id is not a string.");
                                 // Handle the case where "ticket_id" is not a string.
-                                await ShowErrorDialog(errorDialog, "Invalid response format: ticket_id is not a string.");
+                                //await ShowErrorDialog(errorDialog, "Invalid response format: ticket_id is not a string.");
                                 throw new Exception("Invalid response format");
                             }
                             ticketId = ticketIdElement.GetString(); // Return the status
@@ -185,7 +185,7 @@ namespace SupportHubApp
                             {
                                 _logging.LogError("Invalid response format: runtimeStatus is not a string.");
                                 // Handle the case where "runtimeStatus" is not a string.
-                                await ShowErrorDialog(errorDialog, "Invalid response format: runtimeStatus is not a string.");
+                                //await ShowErrorDialog(errorDialog, "Invalid response format: runtimeStatus is not a string.");
                                 throw new Exception("Invalid response format");
                             }
                             runtimeStatus = runtimeStatusElement.GetString(); // Return the status
@@ -195,7 +195,7 @@ namespace SupportHubApp
                         if (string.IsNullOrEmpty(runtimeStatus))
                         {
                             _logging.LogError("Invalid response format: missing status.");
-                            await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
+                            //await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
                             throw new Exception("Invalid response format");
                         }
 
@@ -213,7 +213,7 @@ namespace SupportHubApp
                                 {
                                     _logging.LogError("\tTicket ID is empty.");
                                 }
-                                await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
+                                //await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
                                 throw new Exception("Invalid response format");
                             }
                             return (status, ticketId);
@@ -223,7 +223,7 @@ namespace SupportHubApp
                     {
                         string? errorContent = await response.Content.ReadAsStringAsync();
                         _logging.LogError($"API Error during polling ({response.StatusCode}): {errorContent}");
-                        await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
+                        //await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
                         throw new Exception("API Error during polling");
                     }
 
@@ -234,35 +234,35 @@ namespace SupportHubApp
             catch (HttpRequestException ex)
             {
                 _logging.LogException(ex);
-                await ShowErrorDialog(errorDialog, $"Network Error during polling: {ex.Message}");
+                //await ShowErrorDialog(errorDialog, $"Network Error during polling: {ex.Message}");
                 throw new Exception("Network Error during polling");
             }
             catch (Exception ex)
             {
                 _logging.LogException(ex);
-                await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
+                //await ShowErrorDialog(errorDialog, "There was an unexpected error. Please contact support.");
                 throw new Exception("Unexpected Error during polling");
             }
         }
 
-        private static async Task ShowErrorDialog(ContentDialog errorDialog, string message)
-        {
-            errorDialog.Title = "Error";
-            errorDialog.Content = message;
-            errorDialog.CloseButtonText = "OK";
+        //private static async Task ShowErrorDialog(ContentDialog errorDialog, string message)
+        //{
+        //    errorDialog.Title = "Error";
+        //    errorDialog.Content = message;
+        //    errorDialog.CloseButtonText = "OK";
 
-            // Make sure the dialog is shown on the UI thread.
-            if (errorDialog.DispatcherQueue.HasThreadAccess)
-            {
+        //    // Make sure the dialog is shown on the UI thread.
+        //    if (errorDialog.DispatcherQueue.HasThreadAccess)
+        //    {
 
-                await errorDialog.ShowAsync();
-            }
-            else
-            {
-                errorDialog.DispatcherQueue.TryEnqueue(
-                    Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
-                    async () => await errorDialog.ShowAsync());
-            }
-        }
+        //        await errorDialog.ShowAsync();
+        //    }
+        //    else
+        //    {
+        //        errorDialog.DispatcherQueue.TryEnqueue(
+        //            Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal,
+        //            async () => await errorDialog.ShowAsync());
+        //    }
+        //}
     }
 }

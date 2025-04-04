@@ -50,7 +50,7 @@ namespace SupportHubApp
             base.OnNavigatedTo(e);
             // Reset visual state when navigating *back* to this page.
             VisualStateManager.GoToState(this, "IdleState", false);
-            progress1.IsActive = false;
+            //progress1.IsActive = false;
         }
 
     }

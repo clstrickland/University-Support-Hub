@@ -9,14 +9,14 @@
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
         <StackPanel Padding="20" MinWidth="{Binding ElementName=Root, Path=ActualWidth}" x:Name="MyStackPanel">
-            <TextBlock Text="Report an Issue" FontSize="24" Margin="0,0,0,20"/>
-            <TextBlock x:Name="userInfoTextBlock" Text="Submitting as" FontSize="12" Margin="0,0,0,20" TextWrapping="WrapWholeWords"/>
+            <TextBlock x:Uid="ReportIssue/PageTitle" FontSize="24" Margin="0,0,0,20"/>
+            <TextBlock x:Name="userInfoTextBlock" FontSize="12" Margin="0,0,0,20" TextWrapping="WrapWholeWords"/>
 
-            <TextBox x:Name="IssueTitleTextBox" PlaceholderText="Issue Title" Margin="0,0,0,10"/>
-            <TextBox x:Name="IssueDescriptionTextBox" PlaceholderText="Describe the issue..." TextWrapping="Wrap" AcceptsReturn="True" MinHeight="200" Margin="0,0,0,10"/>
-            <CheckBox x:Name="AttachScreenshotCheckBox" Content="Attach Screenshot to Ticket" Margin="0,0,0,20"/>
+            <TextBox x:Name="IssueTitleTextBox" x:Uid="ReportIssue/IssueTitle" Margin="0,0,0,10"/>
+            <TextBox x:Name="IssueDescriptionTextBox" x:Uid="ReportIssue/IssueDescription" TextWrapping="Wrap" AcceptsReturn="True" MinHeight="200" Margin="0,0,0,10"/>
+            <CheckBox x:Name="AttachScreenshotCheckBox" x:Uid="ReportIssue/AddScreenshotToggleLabel" Margin="0,0,0,20"/>
 
-            <ProgressRing x:Name="ProgressRing"  IsActive="False" Visibility="Collapsed"  
+            <ProgressRing x:Name="ProgressRing" IsActive="False" Visibility="Collapsed"  
                               HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,20,0,0"/>
 
 
@@ -27,8 +27,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="SubmitIssueButton" Content="Submit" Grid.Column="0" Click="SubmitIssueButton_Click"/>
-                <Button x:Name="CancelIssueButton" Content="Cancel" Grid.Column="2" Click="CancelIssueButton_Click"/>
+                <Button x:Name="SubmitIssueButton" x:Uid="Global_Submit" Grid.Column="0" Click="SubmitIssueButton_Click"/>
+                <Button x:Name="CancelIssueButton" x:Uid="Global_Cancel" Grid.Column="2" Click="CancelIssueButton_Click"/>
             </Grid>
 
         </StackPanel>

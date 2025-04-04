@@ -1,0 +1,254 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Auth_Processing.Text" xml:space="preserve">
+    <value>[Åûţĥéñţîçåţîñĝẋẋẋẋẋ ţöẋ Šéļƒ‐Šéŕṽîçéẋẋẋẋ Ţîçķéţẋẋ Šûƀɱîššîöñẋẋẋẋ Šýšţéɱẋẋ]</value>
+    <comment>Shows while waiting for WAM auth to finish</comment>
+  </data>
+  <data name="Global_Cancel.Content" xml:space="preserve">
+    <value>[Çåñçéļẋẋ]</value>
+    <comment>Shows on any cancel button</comment>
+  </data>
+  <data name="Home_CheckForUpdates.AutomationProperties.Name" xml:space="preserve">
+    <value>[Çĥéçķẋẋ ƒöŕẋ Ûþðåţéšẋẋẋ]</value>
+    <comment>Name for button used by accessibility devices</comment>
+  </data>
+  <data name="Home_ReportIssue.AutomationProperties.Name" xml:space="preserve">
+    <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
+    <comment>Name for button used by accessibility devices</comment>
+  </data>
+  <data name="Home_CheckForUpdates_Text.Text" xml:space="preserve">
+    <value>[Çĥéçķẋẋ ƒöŕẋ Ûþðåţéšẋẋẋ]</value>
+    <comment>Text on button visible to user</comment>
+  </data>
+  <data name="Home_ReportIssue_Text.Text" xml:space="preserve">
+    <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
+    <comment>Text on button visible to user</comment>
+  </data>
+  <data name="Home_OpenAppStore_Text.Text" xml:space="preserve">
+    <value>[Öþéñẋẋ Åþþẋ Šţöŕéẋẋ]</value>
+  </data>
+  <data name="Home_OpenAppStore.AutomationProperties.Name" xml:space="preserve">
+    <value>[Öþéñẋẋ Åþþẋ Šţöŕéẋẋ]</value>
+  </data>
+  <data name="Main_AppName.Text" xml:space="preserve">
+    <value>[Šûþþöŕţẋẋẋ Ĥûƀẋ]</value>
+    <comment>This is displayed as the app title throughout the app</comment>
+  </data>
+  <data name="ReportIssue.IssueTitle.PlaceholderText" xml:space="preserve">
+    <value>[Îššûéẋẋ Ţîţļéẋẋ]</value>
+  </data>
+  <data name="ReportIssue.IssueDescription.PlaceholderText" xml:space="preserve">
+    <value>[Ðéšçŕîƀéẋẋẋ ţĥéẋ îššûé···ẋẋẋ]</value>
+  </data>
+  <data name="ReportIssue.AddScreenshotToggleLabel.Content" xml:space="preserve">
+    <value>[Åţţåçĥẋẋ Šçŕééñšĥöţẋẋẋẋ ţöẋ Ţîçķéţẋẋ]</value>
+  </data>
+  <data name="ReportIssue.PageTitle.Text" xml:space="preserve">
+    <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
+  </data>
+  <data name="Global_Submit.Content" xml:space="preserve">
+    <value>[Šûƀɱîţẋẋ]</value>
+    <comment>Shows on any submit button</comment>
+  </data>
+  <data name="ReportIssue.UserInfoPrefix.Text" xml:space="preserve">
+    <value>[Šûƀɱîţţîñĝẋẋẋẋ åšẋ]</value>
+    <comment>Takes form "[[This text]] {name} ({email})"</comment>
+  </data>
+  <data name="TicketSubmitted.Heading.Text" xml:space="preserve">
+    <value>[Šûƀɱîššîöñẋẋẋẋ Ǫûéûéðẋẋ]</value>
+  </data>
+  <data name="TicketSubmitted.Explaination.Text" xml:space="preserve">
+    <value>[Ýöûẋ ŵîļļẋẋ ŕéçéîṽéẋẋẋ åẋ ñöţîƒîçåţîöñẋẋẋẋ ŵĥéñẋẋ ýöûŕẋẋ šûƀɱîššîöñẋẋẋẋ îšẋ þŕöçéššéð·ẋẋẋẋ]</value>
+  </data>
+  <data name="Global_Close.Content" xml:space="preserve">
+    <value>[Çļöšéẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ShowHideWindowCommand.Label" xml:space="preserve">
+    <value>[Šĥöŵ⁄Ĥîðéẋẋẋ Ŵîñðöŵẋẋ]</value>
+  </data>
+  <data name="TrayIcon.OpenFeedbackCommand.Description" xml:space="preserve">
+    <value>[Þŕöṽîðéẋẋẋ Ƒééðƀåçķẋẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ShowHideWindowCommand.Description" xml:space="preserve">
+    <value>[Šĥöŵ⁄Ĥîðéẋẋẋ Ŵîñðöŵẋẋ]</value>
+  </data>
+  <data name="TrayIcon.OpenFeedbackCommand.Label" xml:space="preserve">
+    <value>[Þŕöṽîðéẋẋẋ Ƒééðƀåçķẋẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ShowWindowCommand.Description" xml:space="preserve">
+    <value>[Šĥöŵẋẋ ŴîñðöŵÐẋẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ShowWindowCommand.Label" xml:space="preserve">
+    <value>[Šĥöŵẋẋ ŴîñðöŵĻẋẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ExitApplicationCommand.Description" xml:space="preserve">
+    <value>[Éẋîţẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ExitApplicationCommand.Label" xml:space="preserve">
+    <value>[Éẋîţẋẋ]</value>
+  </data>
+  <data name="TrayIcon.ToolTipText" xml:space="preserve">
+    <value>[Šûþþöŕţẋẋẋ Ĥûƀẋ]</value>
+  </data>
+  <data name="Global_Confirm.Content" xml:space="preserve">
+    <value>[ÖĶẋ]</value>
+    <comment>Usually used as the only option to to alerts (like error messages)</comment>
+  </data>
+  <data name="ReportIssue.CancelDialog.Title" xml:space="preserve">
+    <value>[Çåñçéļẋẋ Šûƀɱîššîöñ¿ẋẋẋẋ]</value>
+  </data>
+  <data name="ReportIssue.CancelDialog.Content" xml:space="preserve">
+    <value>[Ðöẋ ýöûẋ ŵåñţẋẋ ţöẋ çļöšéẋẋ ŵîţĥöûţẋẋẋ šéñðîñĝẋẋẋ ţĥéẋ ţîçķéţ¿ẋẋẋ]</value>
+  </data>
+  <data name="ReportIssue.CancelDialog.PrimaryButtonText" xml:space="preserve">
+    <value>[Ĝöẋ Ɓåçķẋẋ]</value>
+  </data>
+  <data name="ReportIssue.CancelDialog.CloseButtonText" xml:space="preserve">
+    <value>[Çåñçéļẋẋ Ţîçķéţẋẋ]</value>
+  </data>
+  <data name="ReportIssue.ValidationDialog.Title" xml:space="preserve">
+    <value>[Ṁîššîñĝẋẋẋ Îñƒöŕɱåţîöñẋẋẋẋ]</value>
+    <comment>In format "{This Value}: {Unknown Error Message}"</comment>
+  </data>
+  <data name="ReportIssue.ValidationDialog.Content" xml:space="preserve">
+    <value>[Þļéåšéẋẋ éñţéŕẋẋ ƀöţĥẋẋ åñẋ îššûéẋẋ ţîţļéẋẋ åñðẋ ðéšçŕîþţîöñẋẋẋẋ]</value>
+  </data>
+  <data name="ReportIssue.SubmitFailedDialog.Title" xml:space="preserve">
+    <value>[Šûƀɱîššîöñẋẋẋẋ Ƒåîļéðẋẋ]</value>
+  </data>
+  <data name="ReportIssue.SubmitFailedDialog.Content" xml:space="preserve">
+    <value>[Çöûļðẋẋ ñöţẋ šûƀɱîţẋẋ ţĥéẋ ţîçķéţẋẋ]</value>
+  </data>
+  <data name="Auth.LoginFailedDialog.Title" xml:space="preserve">
+    <value>[Åûţĥéñţîçåţîöñẋẋẋẋẋ Ƒåîļéðẋẋ]</value>
+  </data>
+  <data name="Auth.LoginFailedDialog.AccessDeniedMessage" xml:space="preserve">
+    <value>[Çöûļðẋẋ ñöţẋ åûţĥéñţîçåţé∶ẋẋẋẋẋ Åççéššẋẋ ţöẋ Šéļƒ‐Šéŕṽîçéẋẋẋẋ Ţîçķéţẋẋ Šûƀɱîššîöñẋẋẋẋ Šýšţéɱẋẋ îšẋ ðéñîéð·ẋẋẋ]</value>
+  </data>
+  <data name="Auth.LoginFailedDialog.UnknownErrorMessage" xml:space="preserve">
+    <value>[Çöûļðẋẋ ñöţẋ åûţĥéñţîçåţé·ẋẋẋẋẋ Þļéåšéẋẋ çöñţåçţẋẋẋ šûþþöŕţẋẋẋ]</value>
+  </data>
+  <data name="ReportIssue.NoScreenshotDialog.Title" xml:space="preserve">
+    <value>[Ñöẋ Šçŕééñšĥöţẋẋẋẋ Ţåķéñẋẋ]</value>
+  </data>
+  <data name="ReportIssue.NoScreenshotDialog.Content" xml:space="preserve">
+    <value>[Îƒẋ ýöûẋ ðöẋ ñöţẋ ŵîţĥẋẋ ţöẋ åţţåçĥẋẋ åẋ šçŕééñšĥöţ،ẋẋẋẋ þļéåšéẋẋ ûñçĥéçķẋẋẋ ţĥéẋ öþţîöñ·ẋẋẋ Öţĥéŕŵîšé،ẋẋẋẋ ţŕýẋ åĝåîñ·ẋẋ]</value>
+  </data>
+</root>

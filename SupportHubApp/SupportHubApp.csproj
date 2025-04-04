@@ -112,6 +112,7 @@
     <ApplicationIcon>Assets\life-ring.ico</ApplicationIcon>
     <WindowsPackageType>MSIX</WindowsPackageType>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefaultLanguage>en-US</DefaultLanguage>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="C:\Users\CarterStrickland%28Adm\.nuget\packages\microsoft.windowsappsdk\1.6.250205002\buildTransitive\..\include\DeploymentManagerAutoInitializer.cs" />

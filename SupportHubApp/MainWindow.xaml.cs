@@ -7,6 +7,9 @@ using Microsoft.UI;
 using Windows.Graphics;
 //using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.Windows.ApplicationModel.Resources;
+using Microsoft.UI.Xaml.Controls;
+using System.Threading.Tasks;
 //using System.Windows;
 
 namespace SupportHubApp
@@ -20,12 +23,16 @@ namespace SupportHubApp
         private int _initialY;
         private AppWindow? _appWindow;
         private readonly Logging _logging = new() { SubModuleName = "MainWindow" };
+        private readonly Windows.ApplicationModel.Resources.ResourceLoader _resourceLoader;
         public MainWindow()
         {
             this.InitializeComponent();
             InitializeWindow();
             ContentFrame.Navigate(typeof(HomePage));
             ContentFrame.Navigated += ContentFrame_Navigated;
+            _resourceLoader = ((Application.Current as App)?._resourceLoader) ?? throw new InvalidOperationException("App instance not found.");
+            this.Title = _resourceLoader.GetString("Main_AppName/Text");
+
             // Removed: this.Activated += MainWindow_Activated; // No longer needed
         }
 
@@ -39,12 +46,18 @@ namespace SupportHubApp
 
             if (_appWindow != null)
             {
+                
                 _appWindow.TitleBar.ExtendsContentIntoTitleBar = true; // Keep this
                 _appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
                 _appWindow.TitleBar.ButtonInactiveBackgroundColor = Colors.Transparent;
                 _appWindow.TitleBar.PreferredHeightOption = TitleBarHeightOption.Tall;
 
                 _appWindow.SetPresenter(AppWindowPresenterKind.CompactOverlay);
+
+                _appWindow.SetIcon("Assets/life-ring.ico");
+                
+                
+
 
                 //_appWindow.TitleBar.ExtendsContentIntoTitleBar = true; // Keep this
                 //_appWindow.TitleBar.ButtonBackgroundColor = Colors.Transparent;
@@ -76,6 +89,36 @@ namespace SupportHubApp
             _appWindow?.MoveAndResize(new RectInt32(_initialX, _initialY, width, height));
             _logging.LogInfo("MainWindow initialized.");
         }
+
+        public async Task<ContentDialogResult> ShowAlert(string title, string message, string primaryButtonText, string? closeButtonText)
+        {
+            var errorDialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                PrimaryButtonText = primaryButtonText,
+                XamlRoot = this.Content.XamlRoot // Fix: Use Content.XamlRoot instead of this.XamlRoot
+            };
+            if (closeButtonText != null)
+            {
+                errorDialog.CloseButtonText = closeButtonText;
+            }
+            return await errorDialog.ShowAsync();
+        }
+
+        public async Task<ContentDialogResult> ShowAlert(string title, string message, string primaryButtonText)
+        {
+            var errorDialog = new ContentDialog
+            {
+                Title = title,
+                Content = message,
+                PrimaryButtonText = primaryButtonText,
+                XamlRoot = this.Content.XamlRoot // Fix: Use Content.XamlRoot instead of this.XamlRoot
+            };
+
+            return await errorDialog.ShowAsync();
+        }
+
 
         private void ContentFrame_Navigated(object sender, NavigationEventArgs e)
         {

@@ -8,6 +8,7 @@
     mc:Ignorable="d"
     Background="{ThemeResource SystemChromeLowColor}">
 
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*" />
@@ -15,57 +16,40 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Button x:Name="CheckForUpdateButton" Grid.Column="0" Click="CheckForUpdateButton_Click"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" AutomationProperties.Name="Check for Updates">
+        <Button x:Name="CheckForUpdateButton" Grid.Column="0" Click="CheckForUpdateButton_Click" x:Uid="Home_CheckForUpdates"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="U" Modifiers="Control"/>
+            </Button.KeyboardAccelerators>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock Text="&#xf0ab;" FontFamily="{StaticResource FontAwesomeSolid}" Margin="5" VerticalAlignment="Center" FontSize="48" HorizontalAlignment="Center" HorizontalTextAlignment="Center"></TextBlock>
-                <TextBlock Text="Check for Update" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
+                <TextBlock x:Uid="Home_CheckForUpdates_Text" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
         </Button>
 
-        <Button x:Name="ReportIssueButton" Grid.Column="1" Click="ReportIssueButton_Click"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" AutomationProperties.Name="Report an Issue">
+        <Button x:Name="ReportIssueButton" Grid.Column="1" Click="ReportIssueButton_Click" x:Uid="Home_ReportIssue"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5">
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="R" Modifiers="Control"/>
+            </Button.KeyboardAccelerators>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
-                <Grid x:Name="ReportIssueButtonContent">
-                    <TextBlock x:Name="tbFontAwesome2" Text="&#xf071;" FontFamily="{StaticResource FontAwesomeSolid}" Margin="5" VerticalAlignment="Center" FontSize="48" HorizontalAlignment="Center" HorizontalTextAlignment="Center"
-                               RenderTransformOrigin="0.5,0.5">
-                        <TextBlock.RenderTransform>
-                            <RotateTransform x:Name="rotateTransform2"/>
-                        </TextBlock.RenderTransform>
-                    </TextBlock>
-                    <ProgressRing x:Name="progress1" IsActive="True"
-                                  Visibility="Collapsed"  HorizontalAlignment="Center" VerticalAlignment="Center"
-                                  RenderTransformOrigin="0.5,0.5">
-                        <ProgressRing.RenderTransform>
-                            <RotateTransform x:Name="progressRotateTransform"/>
-                        </ProgressRing.RenderTransform>
-                    </ProgressRing>
-                </Grid>
-                <TextBlock Text="Report an Issue" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
+                <TextBlock x:Name="tbFontAwesome2" Text="&#xf071;" FontFamily="{StaticResource FontAwesomeSolid}" Margin="5" VerticalAlignment="Center" FontSize="48" HorizontalAlignment="Center" HorizontalTextAlignment="Center"
+                            RenderTransformOrigin="0.5,0.5">
+                </TextBlock>
+                <TextBlock x:Uid="Home_ReportIssue_Text" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
         </Button>
 
         <Button x:Name="OpenAppStoreButton" Grid.Column="2" Click="OpenAppStoreButton_Click"
-                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" AutomationProperties.Name="Open App Store">
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="5" x:Uid="Home_OpenAppStore">
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="A" Modifiers="Control"/>
+            </Button.KeyboardAccelerators>
             <StackPanel Orientation="Vertical" HorizontalAlignment="Center">
                 <TextBlock  Text="&#xf49e;" FontFamily="{StaticResource FontAwesomeSolid}" Margin="5" VerticalAlignment="Center" FontSize="48" HorizontalAlignment="Center" HorizontalTextAlignment="Center"></TextBlock>
-                <TextBlock Text="Open App Store" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
+                <TextBlock x:Uid="Home_OpenAppStore_Text" TextWrapping="WrapWholeWords" HorizontalAlignment="Center" HorizontalTextAlignment="Center" Margin="0,10,0,0"/>
             </StackPanel>
         </Button>
-        <VisualStateManager.VisualStateGroups>
-            <VisualStateGroup x:Name="ProgressStates">
-                <VisualState x:Name="IdleState"/>
-                <VisualState x:Name="LoadingState">
-                    <Storyboard>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="tbFontAwesome2" Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Collapsed"/>
-                        </ObjectAnimationUsingKeyFrames>
-                        <ObjectAnimationUsingKeyFrames Storyboard.TargetName="progress1" Storyboard.TargetProperty="Visibility">
-                            <DiscreteObjectKeyFrame KeyTime="0" Value="Visible"/>
-                        </ObjectAnimationUsingKeyFrames>
-                    </Storyboard>
-                </VisualState>
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>
+
     </Grid>
 </Page>
