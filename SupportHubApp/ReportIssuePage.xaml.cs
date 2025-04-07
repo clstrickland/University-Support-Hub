@@ -159,7 +159,7 @@ namespace SupportHubApp
 
                 string Title = _resourceLoader.GetString("ReportIssue/ValidationDialog/Title");
                 string Content = _resourceLoader.GetString("ReportIssue/ValidationDialog/Content");
-                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                 if (_mainWindow != null)
                 {
                     ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
@@ -198,7 +198,7 @@ namespace SupportHubApp
 
                     string Title = _resourceLoader.GetString("ReportIssue/NoScreenshotDialog/Title");
                     string Content = _resourceLoader.GetString("ReportIssue/NoScreenshotDialog/Content");
-                    string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                    string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                     if (_mainWindow != null)
                     {
                         ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
@@ -346,7 +346,7 @@ namespace SupportHubApp
 
                 string Title = _resourceLoader.GetString("ReportIssue/SubmitFailedDialog/Title");
                 string Content = $"{_resourceLoader.GetString("ReportIssue/SubmitFailedDialog/Content")}: {ex.Message}";
-                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                 if (_mainWindow != null)
                 {
                     ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);

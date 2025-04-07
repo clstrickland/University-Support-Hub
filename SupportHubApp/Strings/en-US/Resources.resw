@@ -117,55 +117,53 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Auth_Processing.Text" xml:space="preserve">
+  <data name="Auth.Processing.Text" xml:space="preserve">
     <value>Authenticating to Self-Service Ticket Submission System</value>
     <comment>Shows while waiting for WAM auth to finish</comment>
   </data>
-  <data name="Global_Cancel.Content" xml:space="preserve">
-    <value>Cancel</value>
-    <comment>Shows on any cancel button</comment>
-  </data>
-  <data name="Home_CheckForUpdates.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.CheckForUpdates.AutomationProperties.Name" xml:space="preserve">
     <value>Check for Updates</value>
     <comment>Name for button used by accessibility devices</comment>
   </data>
-  <data name="Home_ReportIssue.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.ReportIssue.AutomationProperties.Name" xml:space="preserve">
     <value>Report an Issue</value>
     <comment>Name for button used by accessibility devices</comment>
   </data>
-  <data name="Home_CheckForUpdates_Text.Text" xml:space="preserve">
+  <data name="Home.CheckForUpdates_Text.Text" xml:space="preserve">
     <value>Check for Updates</value>
     <comment>Text on button visible to user</comment>
   </data>
-  <data name="Home_ReportIssue_Text.Text" xml:space="preserve">
+  <data name="Home.ReportIssue_Text.Text" xml:space="preserve">
     <value>Report an Issue</value>
     <comment>Text on button visible to user</comment>
   </data>
-  <data name="Home_OpenAppStore_Text.Text" xml:space="preserve">
+  <data name="Home.OpenAppStore_Text.Text" xml:space="preserve">
     <value>Open App Store</value>
+    <comment>Text on button visible to user for opening the app store</comment>
   </data>
-  <data name="Home_OpenAppStore.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.OpenAppStore.AutomationProperties.Name" xml:space="preserve">
     <value>Open App Store</value>
+    <comment>Name for button used by accessibility devices for opening the app store</comment>
   </data>
-  <data name="Main_AppName.Text" xml:space="preserve">
+  <data name="Global.AppName.Text" xml:space="preserve">
     <value>Support Hub</value>
     <comment>This is displayed as the app title throughout the app</comment>
   </data>
   <data name="ReportIssue.IssueTitle.PlaceholderText" xml:space="preserve">
     <value>Issue Title</value>
+    <comment>Placeholder text shown in the issue title input box before the user types</comment>
   </data>
   <data name="ReportIssue.IssueDescription.PlaceholderText" xml:space="preserve">
     <value>Describe the issue...</value>
+    <comment>Placeholder text shown in the issue description input box before the user types</comment>
   </data>
   <data name="ReportIssue.AddScreenshotToggleLabel.Content" xml:space="preserve">
     <value>Attach Screenshot to Ticket</value>
+    <comment>Label for the toggle switch allowing users to attach a screenshot</comment>
   </data>
   <data name="ReportIssue.PageTitle.Text" xml:space="preserve">
     <value>Report an Issue</value>
-  </data>
-  <data name="Global_Submit.Content" xml:space="preserve">
-    <value>Submit</value>
-    <comment>Shows on any submit button</comment>
+    <comment>The main title displayed at the top of the 'Report an Issue' page</comment>
   </data>
   <data name="ReportIssue.UserInfoPrefix.Text" xml:space="preserve">
     <value>Submitting as</value>
@@ -173,82 +171,114 @@
   </data>
   <data name="TicketSubmitted.Heading.Text" xml:space="preserve">
     <value>Submission Queued</value>
+    <comment>Heading for confirmation page indicating the submission has be queued for ticket creation</comment>
   </data>
   <data name="TicketSubmitted.Explaination.Text" xml:space="preserve">
     <value>You will receive a notification when your submission is processed.</value>
-  </data>
-  <data name="Global_Close.Content" xml:space="preserve">
-    <value>Close</value>
+    <comment>Body text for confirmation page indicating the submission has be queued for ticket creation</comment>
   </data>
   <data name="TrayIcon.ShowHideWindowCommand.Label" xml:space="preserve">
     <value>Show/Hide Window</value>
+    <comment>Label shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.OpenFeedbackCommand.Description" xml:space="preserve">
     <value>Provide Feedback</value>
+    <comment>Tooltip shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ShowHideWindowCommand.Description" xml:space="preserve">
     <value>Show/Hide Window</value>
+    <comment>Tooltip shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.OpenFeedbackCommand.Label" xml:space="preserve">
     <value>Provide Feedback</value>
+    <comment>Label shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ShowWindowCommand.Description" xml:space="preserve">
-    <value>Show WindowD</value>
+    <value>Show Window</value>
+    <comment>Tooltip shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ShowWindowCommand.Label" xml:space="preserve">
-    <value>Show WindowL</value>
+    <value>Show Window</value>
+    <comment>Label shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ExitApplicationCommand.Description" xml:space="preserve">
     <value>Exit</value>
+    <comment>Tooltip shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ExitApplicationCommand.Label" xml:space="preserve">
     <value>Exit</value>
+    <comment>Label shown when hovering over option in system tray popup menu</comment>
   </data>
   <data name="TrayIcon.ToolTipText" xml:space="preserve">
     <value>Support Hub</value>
-  </data>
-  <data name="Global_Confirm.Content" xml:space="preserve">
-    <value>OK</value>
-    <comment>Usually used as the only option to to alerts (like error messages)</comment>
+    <comment>Tooltip shown when hovering over icon in system tray</comment>
   </data>
   <data name="ReportIssue.CancelDialog.Title" xml:space="preserve">
     <value>Cancel Submission?</value>
+    <comment>Title text for the confirmation dialog shown when the user tries to cancel ticket submission</comment>
   </data>
   <data name="ReportIssue.CancelDialog.Content" xml:space="preserve">
     <value>Do you want to close without sending the ticket?</value>
+    <comment>Body text/question asked in the confirmation dialog when the user tries to cancel ticket submission</comment>
   </data>
   <data name="ReportIssue.CancelDialog.PrimaryButtonText" xml:space="preserve">
     <value>Go Back</value>
+    <comment>Button text in the cancel dialog that allows the user to return to editing the ticket</comment>
   </data>
   <data name="ReportIssue.CancelDialog.CloseButtonText" xml:space="preserve">
     <value>Cancel Ticket</value>
+    <comment>Button text in the cancel dialog that confirms the cancellation of the ticket</comment>
   </data>
   <data name="ReportIssue.ValidationDialog.Title" xml:space="preserve">
     <value>Missing Information</value>
-    <comment>In format "{This Value}: {Unknown Error Message}"</comment>
+    <comment>Title for the dialog shown when required information (like title or description) is missing</comment>
   </data>
   <data name="ReportIssue.ValidationDialog.Content" xml:space="preserve">
     <value>Please enter both an issue title and description</value>
+    <comment>Body text for the validation dialog indicating that title and description are required</comment>
   </data>
   <data name="ReportIssue.SubmitFailedDialog.Title" xml:space="preserve">
     <value>Submission Failed</value>
+    <comment>Title for the dialog shown when the ticket submission process fails</comment>
   </data>
   <data name="ReportIssue.SubmitFailedDialog.Content" xml:space="preserve">
     <value>Could not submit the ticket</value>
+    <comment>Body text for the dialog shown when the ticket submission process fails</comment>
   </data>
   <data name="Auth.LoginFailedDialog.Title" xml:space="preserve">
     <value>Authentication Failed</value>
+    <comment>Title for the dialog shown when user authentication fails</comment>
   </data>
   <data name="Auth.LoginFailedDialog.AccessDeniedMessage" xml:space="preserve">
     <value>Could not authenticate: Access to Self-Service Ticket Submission System is denied.</value>
+    <comment>Specific error message shown when authentication fails because access was denied</comment>
   </data>
   <data name="Auth.LoginFailedDialog.UnknownErrorMessage" xml:space="preserve">
     <value>Could not authenticate. Please contact support</value>
+    <comment>Generic error message shown for unknown authentication failures, advising user to contact support</comment>
   </data>
   <data name="ReportIssue.NoScreenshotDialog.Title" xml:space="preserve">
     <value>No Screenshot Taken</value>
+    <comment>Title for the dialog shown if the user indicated they want a screenshot, but none was successfully captured</comment>
   </data>
   <data name="ReportIssue.NoScreenshotDialog.Content" xml:space="preserve">
     <value>If you do not with to attach a screenshot, please uncheck the option. Otherwise, try again.</value>
+    <comment>Body text for the 'No Screenshot Taken' dialog, explaining the user's options</comment>
+  </data>
+  <data name="Global.ActionsLabels.Cancel.Content" xml:space="preserve">
+    <value>Cancel</value>
+    <comment>Shows on any cancel button</comment>
+  </data>
+  <data name="Global.ActionsLabels.Confirm.Content" xml:space="preserve">
+    <value>OK</value>
+    <comment>Usually used as the only option on alerts (like error messages)</comment>
+  </data>
+  <data name="Global.ActionsLabels.Close.Content" xml:space="preserve">
+    <value>Close</value>
+    <comment>Standard text for a button that closes a dialog or window</comment>
+  </data>
+  <data name="Global.ActionsLabels.Submit.Content" xml:space="preserve">
+    <value>Submit</value>
+    <comment>Shows on any submit button</comment>
   </data>
 </root>

@@ -15,7 +15,7 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="20" Margin="5">
             <TextBlock x:Name="ConfirmationTextBlock" x:Uid="TicketSubmitted/Heading" FontSize="24" TextWrapping="WrapWholeWords"/>
             <TextBlock x:Name="StatusTextBlock" x:Uid="TicketSubmitted/Explaination" FontSize="16" TextWrapping="WrapWholeWords" />
-            <Button x:Name="CloseButton" x:Uid="Global_Close" Click="CloseButton_Click" HorizontalAlignment="Center"/>
+            <Button x:Name="CloseButton" x:Uid="Global/ActionsLabels/Close" Click="CloseButton_Click" HorizontalAlignment="Center"/>
         </StackPanel>
     </Grid>
 </Page>

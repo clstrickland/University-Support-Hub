@@ -110,6 +110,7 @@ namespace SupportHubApp
                 }
                 catch (MsalUiRequiredException)
                 {
+
                     _logging.LogInfo("Silent token acquisition failed. Attempting interactive authentication.");
                     // Pass cancellationToken to AcquireTokenInteractive
                     result = await app.AcquireTokenInteractive(scopes)

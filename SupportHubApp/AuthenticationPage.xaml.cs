@@ -50,11 +50,11 @@ namespace SupportHubApp
             cts?.Cancel();
 
             // Navigate back to HomePage.
-            this.Frame.Navigate(typeof(HomePage), Window.Current); //Pass current window
+            //this.Frame.Navigate(typeof(HomePage), Window.Current); //Pass current window
 
             // Close the current window.
-            var window = (Application.Current as App)?.Window;
-            window?.Close();
+            //var window = (Application.Current as App)?.Window;
+            //window?.Close();
 
         }
 
@@ -82,6 +82,7 @@ namespace SupportHubApp
             {
                 _logging.LogInfo("Authentication canceled by user via WAM dialog.");
                 this.Frame.GoBack();
+                //window?.Close();
 
             }
             catch (AuthenticationExceptions.AccessDenied)
@@ -91,7 +92,7 @@ namespace SupportHubApp
 
                 string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
                 string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/AccessDeniedMessage");
-                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                 if (_mainWindow != null)
                 {
                     ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
@@ -103,6 +104,8 @@ namespace SupportHubApp
 
                 // Go back to home page
                 this.Frame.GoBack();
+                
+
             }
             catch (AuthenticationExceptions.ResponseMalformed)
             {
@@ -111,7 +114,7 @@ namespace SupportHubApp
 
                 string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
                 string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/UnknownErrorMessage");
-                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                 if (_mainWindow != null)
                 {
                     ContentDialogResult? result = await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);
@@ -135,7 +138,7 @@ namespace SupportHubApp
 
                 string Title = _resourceLoader.GetString("Auth/LoginFailedDialog/Title");
                 string Content = _resourceLoader.GetString("Auth/LoginFailedDialog/UnknownErrorMessage");
-                string PrimaryButtonText = _resourceLoader.GetString("Global_Confirm/Content");
+                string PrimaryButtonText = _resourceLoader.GetString("Global/ActionsLabels/Confirm/Content");
                 if (_mainWindow != null)
                 {
                     await _mainWindow.ShowAlert(Title, Content, PrimaryButtonText);

@@ -31,7 +31,7 @@ namespace SupportHubApp
             ContentFrame.Navigate(typeof(HomePage));
             ContentFrame.Navigated += ContentFrame_Navigated;
             _resourceLoader = ((Application.Current as App)?._resourceLoader) ?? throw new InvalidOperationException("App instance not found.");
-            this.Title = _resourceLoader.GetString("Main_AppName/Text");
+            this.Title = _resourceLoader.GetString("Global/AppName/Text");
 
             // Removed: this.Activated += MainWindow_Activated; // No longer needed
         }

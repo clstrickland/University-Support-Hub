@@ -117,37 +117,33 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Auth_Processing.Text" xml:space="preserve">
+  <data name="Auth.Processing.Text" xml:space="preserve">
     <value>[Åûţĥéñţîçåţîñĝẋẋẋẋẋ ţöẋ Šéļƒ‐Šéŕṽîçéẋẋẋẋ Ţîçķéţẋẋ Šûƀɱîššîöñẋẋẋẋ Šýšţéɱẋẋ]</value>
     <comment>Shows while waiting for WAM auth to finish</comment>
   </data>
-  <data name="Global_Cancel.Content" xml:space="preserve">
-    <value>[Çåñçéļẋẋ]</value>
-    <comment>Shows on any cancel button</comment>
-  </data>
-  <data name="Home_CheckForUpdates.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.CheckForUpdates.AutomationProperties.Name" xml:space="preserve">
     <value>[Çĥéçķẋẋ ƒöŕẋ Ûþðåţéšẋẋẋ]</value>
     <comment>Name for button used by accessibility devices</comment>
   </data>
-  <data name="Home_ReportIssue.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.ReportIssue.AutomationProperties.Name" xml:space="preserve">
     <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
     <comment>Name for button used by accessibility devices</comment>
   </data>
-  <data name="Home_CheckForUpdates_Text.Text" xml:space="preserve">
+  <data name="Home.CheckForUpdates_Text.Text" xml:space="preserve">
     <value>[Çĥéçķẋẋ ƒöŕẋ Ûþðåţéšẋẋẋ]</value>
     <comment>Text on button visible to user</comment>
   </data>
-  <data name="Home_ReportIssue_Text.Text" xml:space="preserve">
+  <data name="Home.ReportIssue_Text.Text" xml:space="preserve">
     <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
     <comment>Text on button visible to user</comment>
   </data>
-  <data name="Home_OpenAppStore_Text.Text" xml:space="preserve">
+  <data name="Home.OpenAppStore_Text.Text" xml:space="preserve">
     <value>[Öþéñẋẋ Åþþẋ Šţöŕéẋẋ]</value>
   </data>
-  <data name="Home_OpenAppStore.AutomationProperties.Name" xml:space="preserve">
+  <data name="Home.OpenAppStore.AutomationProperties.Name" xml:space="preserve">
     <value>[Öþéñẋẋ Åþþẋ Šţöŕéẋẋ]</value>
   </data>
-  <data name="Main_AppName.Text" xml:space="preserve">
+  <data name="Global.AppName.Text" xml:space="preserve">
     <value>[Šûþþöŕţẋẋẋ Ĥûƀẋ]</value>
     <comment>This is displayed as the app title throughout the app</comment>
   </data>
@@ -163,10 +159,6 @@
   <data name="ReportIssue.PageTitle.Text" xml:space="preserve">
     <value>[Ŕéþöŕţẋẋ åñẋ Îššûéẋẋ]</value>
   </data>
-  <data name="Global_Submit.Content" xml:space="preserve">
-    <value>[Šûƀɱîţẋẋ]</value>
-    <comment>Shows on any submit button</comment>
-  </data>
   <data name="ReportIssue.UserInfoPrefix.Text" xml:space="preserve">
     <value>[Šûƀɱîţţîñĝẋẋẋẋ åšẋ]</value>
     <comment>Takes form "[[This text]] {name} ({email})"</comment>
@@ -176,9 +168,6 @@
   </data>
   <data name="TicketSubmitted.Explaination.Text" xml:space="preserve">
     <value>[Ýöûẋ ŵîļļẋẋ ŕéçéîṽéẋẋẋ åẋ ñöţîƒîçåţîöñẋẋẋẋ ŵĥéñẋẋ ýöûŕẋẋ šûƀɱîššîöñẋẋẋẋ îšẋ þŕöçéššéð·ẋẋẋẋ]</value>
-  </data>
-  <data name="Global_Close.Content" xml:space="preserve">
-    <value>[Çļöšéẋẋ]</value>
   </data>
   <data name="TrayIcon.ShowHideWindowCommand.Label" xml:space="preserve">
     <value>[Šĥöŵ⁄Ĥîðéẋẋẋ Ŵîñðöŵẋẋ]</value>
@@ -206,10 +195,6 @@
   </data>
   <data name="TrayIcon.ToolTipText" xml:space="preserve">
     <value>[Šûþþöŕţẋẋẋ Ĥûƀẋ]</value>
-  </data>
-  <data name="Global_Confirm.Content" xml:space="preserve">
-    <value>[ÖĶẋ]</value>
-    <comment>Usually used as the only option to to alerts (like error messages)</comment>
   </data>
   <data name="ReportIssue.CancelDialog.Title" xml:space="preserve">
     <value>[Çåñçéļẋẋ Šûƀɱîššîöñ¿ẋẋẋẋ]</value>
@@ -250,5 +235,20 @@
   </data>
   <data name="ReportIssue.NoScreenshotDialog.Content" xml:space="preserve">
     <value>[Îƒẋ ýöûẋ ðöẋ ñöţẋ ŵîţĥẋẋ ţöẋ åţţåçĥẋẋ åẋ šçŕééñšĥöţ،ẋẋẋẋ þļéåšéẋẋ ûñçĥéçķẋẋẋ ţĥéẋ öþţîöñ·ẋẋẋ Öţĥéŕŵîšé،ẋẋẋẋ ţŕýẋ åĝåîñ·ẋẋ]</value>
+  </data>
+  <data name="Global.ActionsLabels.Cancel.Content" xml:space="preserve">
+    <value>[Çåñçéļẋẋ]</value>
+    <comment>Shows on any cancel button</comment>
+  </data>
+  <data name="Global.ActionsLabels.Confirm.Content" xml:space="preserve">
+    <value>[ÖĶẋ]</value>
+    <comment>Usually used as the only option to to alerts (like error messages)</comment>
+  </data>
+  <data name="Global.ActionsLabels.Close.Content" xml:space="preserve">
+    <value>[Çļöšéẋẋ]</value>
+  </data>
+  <data name="Global.ActionsLabels.Submit.Content" xml:space="preserve">
+    <value>[Šûƀɱîţẋẋ]</value>
+    <comment>Shows on any submit button</comment>
   </data>
 </root>

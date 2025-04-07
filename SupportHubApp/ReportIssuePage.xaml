@@ -27,8 +27,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Button x:Name="SubmitIssueButton" x:Uid="Global_Submit" Grid.Column="0" Click="SubmitIssueButton_Click"/>
-                <Button x:Name="CancelIssueButton" x:Uid="Global_Cancel" Grid.Column="2" Click="CancelIssueButton_Click"/>
+                <Button x:Name="SubmitIssueButton" x:Uid="Global/ActionsLabels/Submit" Grid.Column="0" Click="SubmitIssueButton_Click"/>
+                <Button x:Name="CancelIssueButton" x:Uid="Global/ActionsLabels/Cancel" Grid.Column="2" Click="CancelIssueButton_Click"/>
             </Grid>
 
         </StackPanel>

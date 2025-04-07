@@ -18,7 +18,7 @@
             <Grid>
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Padding="12,0,0,0">
                     <Image Source="/Assets/TAM-MaroonBox.png" Margin="0,0,8,0"/>
-                    <TextBlock x:Uid="Main_AppName" FontSize="16" VerticalAlignment="Center"/>
+                    <TextBlock x:Uid="Global/AppName" FontSize="16" VerticalAlignment="Center"/>
                 </StackPanel>
 
 
