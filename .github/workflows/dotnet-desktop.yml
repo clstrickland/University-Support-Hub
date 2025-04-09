@@ -5,9 +5,9 @@ name: WinUI 3 MSIX Build
 
 on:
   push:
-    branches: [ "main" ] # Or your primary branch, e.g., master
+    branches: [ "master" ] # Or your primary branch, e.g., master
   pull_request:
-    branches: [ "main" ] # Or your primary branch
+    branches: [ "master" ] # Or your primary branch
 
 jobs:
   build:
