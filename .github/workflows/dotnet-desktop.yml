@@ -75,7 +75,7 @@ jobs:
     # /p:PackageCertificatePassword="${{ secrets.Pfx_Key }}
     - name: Build project and create MSIX package
       run: |
-        msbuild ${{ env.Project_Path }} /t:Publish /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:_GenerateMsixPackage=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile="${{ env.CERTIFICATE_PATH }}""
+        msbuild ${{ env.Project_Path }} /t:Publish /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:_GenerateMsixPackage=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile='${{ env.CERTIFICATE_PATH }}'"
       env:
          Configuration: ${{ matrix.configuration }} # Make matrix config available as env var if needed by scripts inside msbuild
 
