@@ -1,0 +1,99 @@
+# This workflow builds, tests (optional), signs, and packages a WinUI 3 desktop application
+# into an MSIX package using the project file directly.
+
+name: WinUI 3 MSIX Build
+
+on:
+  push:
+    branches: [ "main" ] # Or your primary branch, e.g., master
+  pull_request:
+    branches: [ "main" ] # Or your primary branch
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        # Typically, you only need Release for MSIX distribution.
+        # Add 'Debug' back if you need debug packages for testing.
+        configuration: [Release]
+        platform: [x64] # Add x86 or arm64 if you need to build for those platforms
+
+    runs-on: windows-latest # Essential for Windows/WinUI builds
+
+    env:
+      # --- USER CONFIGURATION REQUIRED ---
+      Solution_Name: SupportHubApp.sln             # Replace with your solution file name (needed for restore/test)
+      Project_Path: SupportHubApp\SupportHubApp.csproj # *** Replace with the relative path to your WinUI 3 project file ***
+      # Test_Project_Path: YourTestProject\YourTestProject.csproj # Optional: Replace with path to your test project if you have one. Remove the test step if not needed.
+      # Target_Framework_Moniker: net8.0-windows10.0.19041.0 # Optional: Specify if needed, otherwise auto-detected. See notes below.
+      # --- END USER CONFIGURATION ---
+
+      # Variables derived from user config
+      Project_Dir: ${{ github.workspace }}\SupportHubApp # Auto-derived base directory of the project (adjust if Project_Path is different)
+      Certificate_File_Name: GitHubActionsWorkflow.pfx
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Required for GitVersion if used, otherwise set to 1 for speed
+
+    - name: Install .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        # Ensure this matches the .NET version targeted by your WinUI 3 project
+        dotnet-version: 8.0.x
+
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v2
+
+    # Optional: Execute unit tests if configured
+    # - name: Execute unit tests
+    #   if: env.Test_Project_Path != 'YourTestProject\YourTestProject.csproj' # Only run if path is configured
+    #   run: dotnet test ${{ env.Test_Project_Path }} --configuration ${{ matrix.configuration }}
+      # Alternative using solution: run: dotnet test ${{ env.Solution_Name }} --configuration ${{ matrix.configuration }}
+
+    # Restore NuGet packages for the solution
+    - name: Restore NuGet packages
+      run: msbuild ${{ env.Solution_Name }} /t:Restore /p:Configuration=${{ matrix.configuration }}
+
+    # Decode the Base64 encoded PFX certificate from secrets
+    # Assumes you have secrets named Base64_Encoded_Pfx and Pfx_Key configured in your repo settings
+    - name: Decode PFX certificate
+      run: |
+        $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
+        $certificatePath = Join-Path -Path $env:Project_Dir -ChildPath $env:Certificate_File_Name
+        [IO.File]::WriteAllBytes($certificatePath, $pfx_cert_byte)
+        echo "Decoded PFX certificate saved to $certificatePath"
+        echo "CERTIFICATE_PATH=$certificatePath" >> $env:GITHUB_ENV
+
+    # Build the WinUI 3 project and generate the MSIX package
+    # This step uses the msbuild command structure you provided
+    # Optional: Specify Output Path if needed, e.g., /p:AppxPackageDir="path\to\output"
+    # Optional: Specify Target Framework if needed, e.g., /p:TargetFramework="$env:Target_Framework_Moniker"
+    # Optional: Specify Runtime Identifier if needed, e.g., /p:RuntimeIdentifier="win-${{ matrix.platform }}"
+    # /p:PackageCertificatePassword="${{ secrets.Pfx_Key }}
+    - name: Build project and create MSIX package
+      run: |
+        msbuild ${{ env.Project_Path }} /t:Publish /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:_GenerateMsixPackage=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile="${{ env.CERTIFICATE_PATH }}""
+      env:
+         Configuration: ${{ matrix.configuration }} # Make matrix config available as env var if needed by scripts inside msbuild
+
+    # Clean up the decoded certificate file
+    - name: Remove PFX certificate file
+      run: Remove-Item -Path "${{ env.CERTIFICATE_PATH }}" -Force
+
+    # Upload the generated MSIX package artifacts
+    # The output path depends on configuration, platform, and target framework.
+    # Using wildcards is often the easiest way to find the AppPackages folder.
+    - name: Upload MSIX package artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: MSIX Package (${{ matrix.configuration }}-${{ matrix.platform }})
+        # This path searches for the AppPackages folder within the project's bin directory structure.
+        # Adjust the starting directory 'SupportHubApp' if your project structure is different.
+        path: |
+          ${{ env.Project_Dir }}\bin\${{ matrix.platform }}\${{ matrix.configuration }}\**\AppPackages\
+        # Alternative, search the whole workspace (slower but more robust if path is complex):
+        # path: |
+        #  **/AppPackages/
