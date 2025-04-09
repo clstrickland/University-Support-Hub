@@ -42,7 +42,7 @@ jobs:
       uses: actions/setup-dotnet@v4
       with:
         # Ensure this matches the .NET version targeted by your WinUI 3 project
-        dotnet-version: 8.0.x
+        dotnet-version: 8.0.311
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
