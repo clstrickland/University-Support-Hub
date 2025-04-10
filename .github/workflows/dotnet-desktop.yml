@@ -128,7 +128,7 @@ jobs:
             Write-Host "MSIX Path Property: $msixPath"
             Write-Host "MSIX Absolute Path: $msixAbsolutePath"
             Write-Host "App Version Property: $appVersion"
-            echo "msix_path=$msixPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            echo "msix_path=$msixAbsolutePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
             echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         } catch {
             Write-Error "Could not parse MSBuild output as JSON. Error: $_"
