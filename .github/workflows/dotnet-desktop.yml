@@ -108,33 +108,29 @@ jobs:
         Write-Host "MSBuild Output:"
         Write-Host $msbuildOutput
 
-        # Attempt to extract JSON block (assuming it starts with '{' and ends with '}')
-        $jsonOutput = $msbuildOutput -match '\{(?:[^{}]|(?R))*\}' | Out-String
+        try {
+            $buildProps = $msbuildOutput | ConvertFrom-Json -ErrorAction Stop
 
-        if (-not $jsonOutput) {
-            Write-Error "Could not find JSON output from MSBuild properties."
+            # Extract the specific properties
+            $msixPath = $buildProps.Properties.AppxPackageOutput
+            $appVersion = $buildProps.Properties.AppxManifestIdentityVersion
+
+            if (-not $msixPath -or -not $appVersion) {
+                Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
+                exit 1
+            }
+
+            # Output the necessary values for subsequent steps
+            Write-Host "MSIX Path Property: $msixPath"
+            Write-Host "App Version Property: $appVersion"
+            echo "msix_path=$msixPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        } catch {
+            Write-Error "Could not parse MSBuild output as JSON. Error: $_"
             exit 1
         }
 
-        Write-Host "Extracted JSON: $jsonOutput"
-        $buildProps = $jsonOutput | ConvertFrom-Json -ErrorAction Stop
 
-        # Extract the specific properties
-        $msixPath = $buildProps.Properties.AppxPackageOutput
-        $appVersion = $buildProps.Properties.AppxManifestIdentityVersion
-
-        if (-not $msixPath -or -not $appVersion) {
-             Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
-             exit 1
-        }
-
-        # Output the necessary values for subsequent steps
-        # Note: msixPath from MSBuild might be relative to project dir or use backslashes.
-        # We'll pass it directly; the custom action needs to handle it correctly on Windows runner.
-        Write-Host "MSIX Path Property: $msixPath"
-        Write-Host "App Version Property: $appVersion"
-        echo "msix_path=$msixPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
-        echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
     - name: Remove PFX certificate file
       if: always() # Run even if build fails to ensure cleanup
