@@ -157,7 +157,7 @@ jobs:
       with:
         name: Deployment Bundle (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
         # Use the exact path from build output - safer than wildcards
-        path: ${{ steps.build_msix.outputs.intunewin_source_zip }}
+        path: ${{ steps.create_intunewin.outputs.intunewin_source_zip }}
 
     # Upload the generated IntuneWin package artifact
     - name: Upload IntuneWin package artifact
