@@ -60,8 +60,11 @@ jobs:
     # Decode the Base64 encoded PFX certificate from secrets
     # Assumes you have secrets named Base64_Encoded_Pfx and Pfx_Key configured in your repo settings
     - name: Decode PFX certificate
+      id: decode_pfx # Give step an ID if needed, though CERTIFICATE_PATH is set via GITHUB_ENV
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
+        # Ensure Project_Dir exists if needed before joining path
+        New-Item -ItemType Directory -Force -Path $env:Project_Dir | Out-Null
         $certificatePath = Join-Path -Path $env:Project_Dir -ChildPath $env:Certificate_File_Name
         [IO.File]::WriteAllBytes($certificatePath, $pfx_cert_byte)
         echo "Decoded PFX certificate saved to $certificatePath"
@@ -74,26 +77,90 @@ jobs:
     # Optional: Specify Runtime Identifier if needed, e.g., /p:RuntimeIdentifier="win-${{ matrix.platform }}"
     # /p:PackageCertificatePassword="${{ secrets.Pfx_Key }}
     - name: Build project and create MSIX package
+      id: build_msix # Add ID to reference outputs
+      shell: pwsh # Use powershell for easier JSON parsing
       run: |
-        msbuild ${{ env.Project_Path }} /t:Publish /p:Configuration=${{ matrix.configuration }} /p:Platform=${{ matrix.platform }} /p:_GenerateMsixPackage=true /p:AppxPackageSigningEnabled=true /p:PackageCertificateKeyFile="${{ env.CERTIFICATE_PATH }}" /p:SelfContained=true
-      env:
-         Configuration: ${{ matrix.configuration }} # Make matrix config available as env var if needed by scripts inside msbuild
+        $msbuildArgs = @(
+            '"${{ env.Project_Path }}"', # Quote path in case of spaces
+            "/t:Publish",
+            "/p:Configuration=${{ matrix.configuration }}",
+            "/p:Platform=${{ matrix.platform }}",
+            "/p:_GenerateMsixPackage=true",
+            "/p:AppxPackageSigningEnabled=true",
+            "/p:PackageCertificateKeyFile=${{ env.CERTIFICATE_PATH }}",
+            # Make sure Pfx_Key secret is configured if the PFX is password protected
+            # "/p:PackageCertificatePassword=${{ secrets.Pfx_Key }}", # Uncomment if PFX has a password
+            "/p:SelfContained=true",
+            # Add flags to get properties and format as JSON for easy parsing
+            "/getProperty:AppxPackageOutput",
+            "/getProperty:AppxManifestIdentityVersion",
+            "/nologo", # Suppress logo
+            "/clp:NoSummary" # Suppress build summary for cleaner output
+            # Optional: "/bl" # Creates a detailed binary log msbuild.binlog
+        )
 
-    # Clean up the decoded certificate file
+        Write-Host "Running MSBuild: msbuild $($msbuildArgs -join ' ')"
+
+        # Execute msbuild and capture stdout
+        $msbuildOutput = msbuild $msbuildArgs | Out-String
+
+        Write-Host "MSBuild Output:"
+        Write-Host $msbuildOutput
+
+        # Attempt to extract JSON block (assuming it starts with '{' and ends with '}')
+        $jsonOutput = $msbuildOutput -match '\{(?:[^{}]|(?R))*\}' | Out-String
+
+        if (-not $jsonOutput) {
+            Write-Error "Could not find JSON output from MSBuild properties."
+            exit 1
+        }
+
+        Write-Host "Extracted JSON: $jsonOutput"
+        $buildProps = $jsonOutput | ConvertFrom-Json -ErrorAction Stop
+
+        # Extract the specific properties
+        $msixPath = $buildProps.Properties.AppxPackageOutput
+        $appVersion = $buildProps.Properties.AppxManifestIdentityVersion
+
+        if (-not $msixPath -or -not $appVersion) {
+             Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
+             exit 1
+        }
+
+        # Output the necessary values for subsequent steps
+        # Note: msixPath from MSBuild might be relative to project dir or use backslashes.
+        # We'll pass it directly; the custom action needs to handle it correctly on Windows runner.
+        Write-Host "MSIX Path Property: $msixPath"
+        Write-Host "App Version Property: $appVersion"
+        echo "msix_path=$msixPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
     - name: Remove PFX certificate file
-      run: Remove-Item -Path "${{ env.CERTIFICATE_PATH }}" -Force
+      if: always() # Run even if build fails to ensure cleanup
+      run: Remove-Item -Path "${{ env.CERTIFICATE_PATH }}" -Force -ErrorAction SilentlyContinue
 
-    # Upload the generated MSIX package artifacts
-    # The output path depends on configuration, platform, and target framework.
-    # Using wildcards is often the easiest way to find the AppPackages folder.
-    - name: Upload MSIX package artifacts
+
+    - name: Create IntuneWin Package using MSIX-IntuneWin-Packager action
+      id: create_intunewin # Give step an ID to access its output
+      uses: clstrickland/MSIX-IntuneWin-Packager@v0.1.0 # Use a specific version for stability
+      with:
+        # Pass the outputs from the build_msix step
+        msix_file_path: ${{ steps.build_msix.outputs.msix_path }}
+        app_version: ${{ steps.build_msix.outputs.app_version }}
+
+
+    # Upload the generated MSIX package (Optional - keep if you still need the raw MSIX)
+    - name: Upload MSIX package artifact
       uses: actions/upload-artifact@v4
       with:
-        name: MSIX Package (${{ matrix.configuration }}-${{ matrix.platform }})
-        # This path searches for the AppPackages folder within the project's bin directory structure.
-        # Adjust the starting directory 'SupportHubApp' if your project structure is different.
-        path: |
-          ${{ env.Project_Dir }}\bin\${{ matrix.platform }}\${{ matrix.configuration }}\**\AppPackages\
-        # Alternative, search the whole workspace (slower but more robust if path is complex):
-        # path: |
-        #  **/AppPackages/
+        name: MSIX Package (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
+        # Use the exact path from build output - safer than wildcards
+        path: ${{ steps.build_msix.outputs.msix_path }}
+
+    # Upload the generated IntuneWin package artifact
+    - name: Upload IntuneWin package artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: IntuneWin Package (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
+        # Use the output path from the create_intunewin step
+        path: ${{ steps.create_intunewin.outputs.intunewin_file_path }} # This comes from your custom action's output
