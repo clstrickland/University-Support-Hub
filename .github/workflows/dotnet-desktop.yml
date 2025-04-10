@@ -119,9 +119,14 @@ jobs:
                 Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
                 exit 1
             }
-
+            
+            $projectRelativeDir = Split-Path '${{ env.Project_Path }}' # Gets "SupportHubApp" from "SupportHubApp\SupportHubApp.csproj"
+            $projectFullPath = Join-Path $env:GITHUB_WORKSPACE $projectRelativeDir
+            $msixAbsolutePath = Join-Path $projectFullPath $msixPath
+            
             # Output the necessary values for subsequent steps
             Write-Host "MSIX Path Property: $msixPath"
+            Write-Host "MSIX Absolute Path: $msixAbsolutePath"
             Write-Host "App Version Property: $appVersion"
             echo "msix_path=$msixPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
             echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
@@ -139,7 +144,7 @@ jobs:
 
     - name: Create IntuneWin Package using MSIX-IntuneWin-Packager action
       id: create_intunewin # Give step an ID to access its output
-      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.1 # Use a specific version for stability
+      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.2 # Use a specific version for stability
       with:
         # Pass the outputs from the build_msix step
         msix_file_path: ${{ steps.build_msix.outputs.msix_path }}
