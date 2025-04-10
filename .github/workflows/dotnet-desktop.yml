@@ -144,7 +144,7 @@ jobs:
 
     - name: Create IntuneWin Package using MSIX-IntuneWin-Packager action
       id: create_intunewin # Give step an ID to access its output
-      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.10 # Use a specific version for stability
+      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.11 # Use a specific version for stability
       with:
         # Pass the outputs from the build_msix step
         msix_file_path: ${{ steps.build_msix.outputs.msix_path }}
@@ -152,12 +152,12 @@ jobs:
 
 
     # Upload the generated MSIX package (Optional - keep if you still need the raw MSIX)
-    - name: Upload MSIX package artifact
+    - name: Upload Bundle Archive artifact
       uses: actions/upload-artifact@v4
       with:
-        name: MSIX Package (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
+        name: Deployment Bundle (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
         # Use the exact path from build output - safer than wildcards
-        path: ${{ steps.build_msix.outputs.msix_path }}
+        path: ${{ steps.build_msix.outputs.intunewin_source_zip }}
 
     # Upload the generated IntuneWin package artifact
     - name: Upload IntuneWin package artifact
@@ -167,10 +167,5 @@ jobs:
         # Use the output path from the create_intunewin step
         path: ${{ steps.create_intunewin.outputs.intunewin_file_path }} # This comes from your custom action's output
 
-    # Upload the generated IntuneWin package artifact
-    - name: Upload IntuneWin package artifact
-      uses: actions/upload-artifact@v4
-      with:
-        name: IntuneWin Deployment Scripts (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
-        # Use the output path from the create_intunewin step
-        path: ${{ steps.create_intunewin.outputs.deployment_scripts_zip }} # This comes from your custom action's output
+
+
