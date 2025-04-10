@@ -80,8 +80,9 @@ jobs:
       id: build_msix # Add ID to reference outputs
       shell: pwsh # Use powershell for easier JSON parsing
       run: |
+        Write-Host "CWD: $(Get-Location)"
         $msbuildArgs = @(
-            '"${{ env.Project_Path }}"', # Quote path in case of spaces
+            "${{ env.Project_Path }}",
             "/t:Publish",
             "/p:Configuration=${{ matrix.configuration }}",
             "/p:Platform=${{ matrix.platform }}",
