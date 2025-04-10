@@ -144,7 +144,7 @@ jobs:
 
     - name: Create IntuneWin Package using MSIX-IntuneWin-Packager action
       id: create_intunewin # Give step an ID to access its output
-      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.8 # Use a specific version for stability
+      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.9 # Use a specific version for stability
       with:
         # Pass the outputs from the build_msix step
         msix_file_path: ${{ steps.build_msix.outputs.msix_path }}
