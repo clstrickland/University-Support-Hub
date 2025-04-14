@@ -229,17 +229,23 @@ jobs:
     name: render_markdown
     needs: build_and_package
     steps:
-      - name: Download math result for job 2
+      - name: Download Intune Package Bundle artifact
+        id: dl-bundle
         uses: actions/download-artifact@v4
         with:
-          name: homework_final
+          name: ${{ needs.build_and_package.outputs.output_bundle_path }}
+      - name: Download Intune Source Bundle artifact
+        id: dl-bundle-src
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ needs.build_and_package.outputs.source_bundle_path }}
       - name: Markdown to PDF and HTML
         # You may pin to the exact commit or the version.
         # uses: BaileyJM02/markdown-to-pdf@1be26775add5f94fb55d4a2ce36ff7cad23b8dd0
         uses: BaileyJM02/markdown-to-pdf@v1
         with:
           # (Path) or (File) The location of the folder containing your .md or .markdown files, or a path to a single .md or .markdown file that you would like to convert.
-          input_path: "${{ needs.build_and_package.outputs.output_bundle_path }}/INSTRUCTIONS.md"
+          input_path: "${{ steps.dl-bundle.outputs.download-path }}/INSTRUCTIONS.md"
           # (Path) The location of the folder containing your .md or .markdown files
           # input_dir: # optional
           # (Path) The location of the folder containing your images, this should be the route of all images
@@ -247,7 +253,7 @@ jobs:
           # (String) The path you use to import your images that can be replaced with the server URL
           # image_import: # optional
           # (Path) The location of the folder you want to place the built files
-          output_dir: "${{ needs.build_and_package.outputs.output_bundle_path }}"
+          output_dir: "${{ steps.dl-bundle.outputs.download-path }}"
           # (Boolean) Whether to also create a .html file
           build_html: true
           # (Boolean) Whether to create a .pdf file (the intended behaviour)
