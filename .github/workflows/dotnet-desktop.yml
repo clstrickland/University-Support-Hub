@@ -29,6 +29,7 @@ jobs:
       APP_SOURCE_TEMP_DIR: app_source_tmp # Temporary folder for MSIX staging
       INTUNE_OUTPUT_BUNDLE_NAME: SupportHub_IntunePackage
       INTUNE_SOURCE_BUNDLE_NAME: SupportHub_IntunePackage_Source
+      APP_NAME_BASE: SupportHubApp
 
     steps:
     - name: Checkout repository
@@ -95,17 +96,35 @@ jobs:
                 Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
                 exit 1
             }
-            $projectRelativeDir = Split-Path '${{ env.Project_Path }}' # Gets "SupportHubApp" from "SupportHubApp\SupportHubApp.csproj"
-            $projectFullPath = Join-Path $env:GITHUB_WORKSPACE $projectRelativeDir
-            $msixAbsolutePath = Join-Path $projectFullPath $msixPath
+
+            # --- Corrected Path Calculation ---
+            # Get the absolute path to the project directory
+            # Use double quotes for evaluation and -Parent to get the directory
+            $projectDirFullPath = Split-Path (Join-Path $env:GITHUB_WORKSPACE "${{ env.Project_Path }}") -Parent
+
+            # Join the project directory path with the (assumed relative) msix path
+            $msixAbsolutePath = Join-Path $projectDirFullPath $msixPath
+
+            # Optional: Verify the path exists
+            if (-not (Test-Path $msixAbsolutePath -PathType Leaf)) {
+                 Write-Warning "Constructed MSIX absolute path '$msixAbsolutePath' not found or not a file. Check if AppxPackageOutput ('$msixPath') is relative to the project directory."
+                 # If it fails, maybe the original path was already absolute? Output it instead.
+                 $msixOutputPath = $msixPath
+            } else {
+                 $msixOutputPath = $msixAbsolutePath
+            }
+            # --- End Corrected Path Calculation ---
 
             Write-Host "MSIX Path Property: $msixPath"
-            Write-Host "MSIX Absolute Path: $msixAbsolutePath"
+            Write-Host "Using MSIX Path: $msixOutputPath"
             Write-Host "App Version Property: $appVersion"
-            echo "msix_path=$msixAbsolutePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+            # Output the determined path for subsequent steps
+            echo "msix_path=$msixOutputPath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
             echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         } catch {
-            Write-Error "Could not parse MSBuild output. Error: $_"; exit 1
+            # This catch block is now only for ConvertFrom-Json errors
+            Write-Error "Could not parse MSBuild output as JSON. Error: $_"; exit 1
         }
 
     - name: Remove PFX certificate file
@@ -121,7 +140,6 @@ jobs:
         $msixFullPath = "${{ steps.build_msix.outputs.msix_path }}"
         $appVersion = "${{ steps.build_msix.outputs.app_version }}"
         $msixFileName = Split-Path -Path $msixFullPath -Leaf
-
         # Create the multiline variable string required by the process-templates action
         $variablesString = @"
         MSIX_FILE_NAME=$msixFileName
@@ -165,12 +183,13 @@ jobs:
     - name: Package for Intune
       id: package_intune_app
       # Use the local action you created
-      uses: clstrickland/Intune-Win32-Packager@v0.2
+      uses: clstrickland/Intune-Win32-Packager@v0.3
       with:
         app_source_folder_path: ${{ steps.prep_app_folder.outputs.app_folder_path }}
         install_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Install.ps1"
         uninstall_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Uninstall.ps1"
         detection_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Detect.ps1" # Assumes Detect.ps1.eps exists
+        app_name: ${{ env.APP_NAME_BASE }}
         output_bundle_name: ${{ env.INTUNE_OUTPUT_BUNDLE_NAME }}
         source_bundle_name: ${{ env.INTUNE_SOURCE_BUNDLE_NAME }}
 
