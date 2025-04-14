@@ -165,7 +165,7 @@ jobs:
     - name: Package for Intune
       id: package_intune_app
       # Use the local action you created
-      uses: clstrickland/Intune-Win32-Packager@v0.1
+      uses: clstrickland/Intune-Win32-Packager@v0.2
       with:
         app_source_folder_path: ${{ steps.prep_app_folder.outputs.app_folder_path }}
         install_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Install.ps1"
