@@ -177,6 +177,8 @@ jobs:
 
         Write-Host "Copying MSIX '$MsixDirectory' to '$tempAppDir'"
         Copy-Item -Path $MsixDirectory -Destination $tempAppDir -Recurse -Force
+        Get-ChildItem -Path $tempAppDir -Recurse | Select-Object FullName, Mode | Format-Table -AutoSize | Out-String | Write-Host
+        Get-ChildItem -Path $MsixDirectory -Recurse | Select-Object FullName, Mode | Format-Table -AutoSize | Out-String | Write-Host
 
         # Output the path to the temporary folder
         echo "app_folder_path=${{ env.APP_SOURCE_TEMP_DIR }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
