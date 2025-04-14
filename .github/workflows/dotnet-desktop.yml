@@ -234,11 +234,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build_and_package.outputs.output_bundle_path }}
+          path: dl-bundle
       - name: Download Intune Source Bundle artifact
         id: dl-bundle-src
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build_and_package.outputs.source_bundle_path }}
+          path: dl-bundle-src
       - name: List Contents
         run: |
           echo "Contents:"
@@ -246,8 +248,8 @@ jobs:
       - name: Markdown to PDF and HTML
         uses: BaileyJM02/markdown-to-pdf@v1
         with:
-          input_path: "${{ steps.dl-bundle.outputs.download-path }}/${{ needs.build_and_package.outputs.output_bundle_path }}/INSTRUCTIONS.md"
-          output_dir: "${{ steps.dl-bundle.outputs.download-path }}/${{ needs.build_and_package.outputs.output_bundle_path }}"
+          input_path: "dl-bundle/INSTRUCTIONS.md"
+          output_dir: "dl-bundle"
           build_html: true
           build_pdf: true
           table_of_contents: false
