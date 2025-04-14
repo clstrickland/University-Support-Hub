@@ -1,36 +1,34 @@
-# This workflow builds, tests (optional), signs, and packages a WinUI 3 desktop application
-# into an MSIX package using the project file directly.
+# .github/workflows/dotnet-desktop.yml
 
-name: WinUI 3 MSIX Build
+name: WinUI 3 MSIX Build and Intune Package
 
 on:
   push:
-    branches: [ "master" ] # Or your primary branch, e.g., master
+    branches: [ "master" ] # Or your primary branch
   pull_request:
     branches: [ "master" ] # Or your primary branch
 
 jobs:
-  build:
+  build_and_package: # Combined job name for clarity
     strategy:
       matrix:
-        # Typically, you only need Release for MSIX distribution.
-        # Add 'Debug' back if you need debug packages for testing.
         configuration: [Release]
         platform: [x64] # Add x86 or arm64 if you need to build for those platforms
 
-    runs-on: windows-latest # Essential for Windows/WinUI builds
+    runs-on: windows-latest
 
     env:
-      # --- USER CONFIGURATION REQUIRED ---
-      Solution_Name: SupportHubApp.sln             # Replace with your solution file name (needed for restore/test)
-      Project_Path: SupportHubApp\SupportHubApp.csproj # *** Replace with the relative path to your WinUI 3 project file ***
-      # Test_Project_Path: YourTestProject\YourTestProject.csproj # Optional: Replace with path to your test project if you have one. Remove the test step if not needed.
-      # Target_Framework_Moniker: net8.0-windows10.0.19041.0 # Optional: Specify if needed, otherwise auto-detected. See notes below.
-      # --- END USER CONFIGURATION ---
-
-      # Variables derived from user config
-      Project_Dir: ${{ github.workspace }}\SupportHubApp # Auto-derived base directory of the project (adjust if Project_Path is different)
+      Solution_Name: SupportHubApp.sln
+      Project_Path: SupportHubApp\SupportHubApp.csproj
+      # Test_Project_Path: YourTestProject\YourTestProject.csproj # Optional
+      Project_Dir: ${{ github.workspace }}\SupportHubApp
       Certificate_File_Name: GitHubActionsWorkflow.pfx
+      # --- New env vars for clarity ---
+      TEMPLATE_SOURCE_DIR: deployment/scriptTemplates
+      PROCESSED_SCRIPTS_DIR: deployment/processedScripts
+      APP_SOURCE_TEMP_DIR: app_source_tmp # Temporary folder for MSIX staging
+      INTUNE_OUTPUT_BUNDLE_NAME: SupportHub_IntunePackage
+      INTUNE_SOURCE_BUNDLE_NAME: SupportHub_IntunePackage_Source
 
     steps:
     - name: Checkout repository
@@ -41,8 +39,8 @@ jobs:
     - name: Install .NET SDK
       uses: actions/setup-dotnet@v4
       with:
-        # Ensure this matches the .NET version targeted by your WinUI 3 project
-        dotnet-version: 8.0.311
+        dotnet-version: 8.0.311 # Match your project's target
+        cache: true
 
     - name: Setup MSBuild
       uses: microsoft/setup-msbuild@v2
@@ -57,28 +55,18 @@ jobs:
     - name: Restore NuGet packages
       run: msbuild ${{ env.Solution_Name }} /t:Restore /p:Configuration=${{ matrix.configuration }}
 
-    # Decode the Base64 encoded PFX certificate from secrets
-    # Assumes you have secrets named Base64_Encoded_Pfx and Pfx_Key configured in your repo settings
     - name: Decode PFX certificate
-      id: decode_pfx # Give step an ID if needed, though CERTIFICATE_PATH is set via GITHUB_ENV
       run: |
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.Base64_Encoded_Pfx }}")
-        # Ensure Project_Dir exists if needed before joining path
         New-Item -ItemType Directory -Force -Path $env:Project_Dir | Out-Null
         $certificatePath = Join-Path -Path $env:Project_Dir -ChildPath $env:Certificate_File_Name
         [IO.File]::WriteAllBytes($certificatePath, $pfx_cert_byte)
         echo "Decoded PFX certificate saved to $certificatePath"
         echo "CERTIFICATE_PATH=$certificatePath" >> $env:GITHUB_ENV
 
-    # Build the WinUI 3 project and generate the MSIX package
-    # This step uses the msbuild command structure you provided
-    # Optional: Specify Output Path if needed, e.g., /p:AppxPackageDir="path\to\output"
-    # Optional: Specify Target Framework if needed, e.g., /p:TargetFramework="$env:Target_Framework_Moniker"
-    # Optional: Specify Runtime Identifier if needed, e.g., /p:RuntimeIdentifier="win-${{ matrix.platform }}"
-    # /p:PackageCertificatePassword="${{ secrets.Pfx_Key }}
     - name: Build project and create MSIX package
-      id: build_msix # Add ID to reference outputs
-      shell: pwsh # Use powershell for easier JSON parsing
+      id: build_msix
+      shell: pwsh
       run: |
         Write-Host "CWD: $(Get-Location)"
         $msbuildArgs = @(
@@ -89,25 +77,15 @@ jobs:
             "/p:_GenerateMsixPackage=true",
             "/p:AppxPackageSigningEnabled=true",
             "/p:PackageCertificateKeyFile=${{ env.CERTIFICATE_PATH }}",
-            # Make sure Pfx_Key secret is configured if the PFX is password protected
-            # "/p:PackageCertificatePassword=${{ secrets.Pfx_Key }}", # Uncomment if PFX has a password
+            # "/p:PackageCertificatePassword=${{ secrets.Pfx_Key }}", # Uncomment if needed
             "/p:SelfContained=true",
-            # Add flags to get properties and format as JSON for easy parsing
-            "/getProperty:AppxPackageOutput",
-            "/getProperty:AppxManifestIdentityVersion",
-            "/nologo", # Suppress logo
-            "/clp:NoSummary" # Suppress build summary for cleaner output
-            # Optional: "/bl" # Creates a detailed binary log msbuild.binlog
+            "/getProperty:AppxPackageOutput", # Get full path
+            "/getProperty:AppxManifestIdentityVersion", # Get version
+            "/nologo", "/clp:NoSummary"
         )
-
         Write-Host "Running MSBuild: msbuild $($msbuildArgs -join ' ')"
-
-        # Execute msbuild and capture stdout
         $msbuildOutput = msbuild $msbuildArgs | Out-String
-
-        Write-Host "MSBuild Output:"
-        Write-Host $msbuildOutput
-
+        Write-Host "MSBuild Output:"; Write-Host $msbuildOutput
         try {
             $buildProps = $msbuildOutput | ConvertFrom-Json -ErrorAction Stop
 
@@ -119,53 +97,104 @@ jobs:
                 Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
                 exit 1
             }
-            
-            $projectRelativeDir = Split-Path '${{ env.Project_Path }}' # Gets "SupportHubApp" from "SupportHubApp\SupportHubApp.csproj"
-            $projectFullPath = Join-Path $env:GITHUB_WORKSPACE $projectRelativeDir
-            $msixAbsolutePath = Join-Path $projectFullPath $msixPath
-            
-            # Output the necessary values for subsequent steps
+
             Write-Host "MSIX Path Property: $msixPath"
             Write-Host "MSIX Absolute Path: $msixAbsolutePath"
             Write-Host "App Version Property: $appVersion"
             echo "msix_path=$msixAbsolutePath" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
             echo "app_version=$appVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
         } catch {
-            Write-Error "Could not parse MSBuild output as JSON. Error: $_"
-            exit 1
+            Write-Error "Could not parse MSBuild output. Error: $_"; exit 1
         }
 
-
-
     - name: Remove PFX certificate file
-      if: always() # Run even if build fails to ensure cleanup
+      if: always()
       run: Remove-Item -Path "${{ env.CERTIFICATE_PATH }}" -Force -ErrorAction SilentlyContinue
 
+    # --- Start Intune Packaging Steps ---
 
-    - name: Create IntuneWin Package using MSIX-IntuneWin-Packager action
-      id: create_intunewin # Give step an ID to access its output
-      uses: clstrickland/MSIX-IntuneWin-Packager@v0.2.13 # Use a specific version for stability
+    - name: Prepare Template Variables
+      id: prep_template_vars
+      shell: pwsh
+      run: |
+        $msixFullPath = "${{ steps.build_msix.outputs.msix_path }}"
+        $appVersion = "${{ steps.build_msix.outputs.app_version }}"
+        $msixFileName = Split-Path -Path $msixFullPath -Leaf
+
+        # Create the multiline variable string required by the process-templates action
+        $variablesString = @"
+        MSIX_FILE_NAME=$msixFileName
+        APP_VERSION=$appVersion
+        "@
+
+        Write-Host "Template Variables Prepared:"
+        Write-Host $variablesString
+
+        # Output the variables using the heredoc syntax for GITHUB_OUTPUT
+        echo "template_variables<<EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo $variablesString | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        echo "EOF" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+    - name: Process Script Templates
+      # Use the local action you created
+      # Ensure the path is correct relative to this workflow file's location
+      uses: clstrickland/Template-Processor@v0.1
       with:
-        # Pass the outputs from the build_msix step
-        msix_file_path: ${{ steps.build_msix.outputs.msix_path }}
-        app_version: ${{ steps.build_msix.outputs.app_version }}
+        source_directory: ${{ env.TEMPLATE_SOURCE_DIR }}
+        destination_directory: ${{ env.PROCESSED_SCRIPTS_DIR }}
+        template_extension: '.eps'
+        variables: ${{ steps.prep_template_vars.outputs.template_variables }}
 
+    - name: Prepare App Source Folder for Packaging
+      id: prep_app_folder
+      shell: pwsh
+      run: |
+        $msixFullPath = "${{ steps.build_msix.outputs.msix_path }}"
+        $tempAppDir = Join-Path -Path $env:GITHUB_WORKSPACE -ChildPath "${{ env.APP_SOURCE_TEMP_DIR }}"
 
-    # Upload the generated MSIX package (Optional - keep if you still need the raw MSIX)
-    - name: Upload Bundle Archive artifact
+        Write-Host "Creating temporary app source folder: $tempAppDir"
+        New-Item -Path $tempAppDir -ItemType Directory -Force | Out-Null
+
+        Write-Host "Copying MSIX '$msixFullPath' to '$tempAppDir'"
+        Copy-Item -Path $msixFullPath -Destination $tempAppDir -Force
+
+        # Output the path to the temporary folder
+        echo "app_folder_path=${{ env.APP_SOURCE_TEMP_DIR }}" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+
+    - name: Package for Intune
+      id: package_intune_app
+      # Use the local action you created
+      uses: clstrickland/Intune-Win32-Packager@v0.1
+      with:
+        app_source_folder_path: ${{ steps.prep_app_folder.outputs.app_folder_path }}
+        install_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Install.ps1"
+        uninstall_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Uninstall.ps1"
+        detection_script_path: "${{ env.PROCESSED_SCRIPTS_DIR }}/Detect.ps1" # Assumes Detect.ps1.eps exists
+        output_bundle_name: ${{ env.INTUNE_OUTPUT_BUNDLE_NAME }}
+        source_bundle_name: ${{ env.INTUNE_SOURCE_BUNDLE_NAME }}
+
+    # --- End Intune Packaging Steps ---
+
+    # --- Start Artifact Upload Steps ---
+
+    # - name: Upload MSIX package artifact (Optional)
+    #   uses: actions/upload-artifact@v4
+    #   with:
+    #     name: MSIX Package (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
+    #     path: ${{ steps.build_msix.outputs.msix_path }}
+
+    - name: Upload Intune Package Bundle artifact
       uses: actions/upload-artifact@v4
       with:
-        name: Deployment Bundle (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
-        # Use the exact path from build output - safer than wildcards
-        path: ${{ steps.create_intunewin.outputs.intunewin_source_zip }}
+        # Use the bundle name as the artifact name for clarity
+        name: ${{ steps.package_intune_app.outputs.output_bundle_path }}
+        # Upload the entire folder produced by the package-intune-app action
+        path: ${{ steps.package_intune_app.outputs.output_bundle_path }}
 
-    # Upload the generated IntuneWin package artifact
-    - name: Upload IntuneWin package artifact
+    - name: Upload Intune Source Bundle artifact
       uses: actions/upload-artifact@v4
       with:
-        name: IntuneWin Package (${{ matrix.configuration }}-${{ matrix.platform }}) V${{ steps.build_msix.outputs.app_version }}
-        # Use the output path from the create_intunewin step
-        path: ${{ steps.create_intunewin.outputs.intunewin_file_path }} # This comes from your custom action's output
+        name: ${{ steps.package_intune_app.outputs.source_bundle_path }}
+        path: ${{ steps.package_intune_app.outputs.source_bundle_path }}
 
-
-
+    # --- End Artifact Upload Steps ---
