@@ -176,7 +176,7 @@ jobs:
         New-Item -Path $tempAppDir -ItemType Directory -Force | Out-Null
 
         Write-Host "Copying MSIX '$MsixDirectory' to '$tempAppDir'"
-        Copy-Item -Path $MsixDirectory -Destination $tempAppDir -Recurse -Force
+        Copy-Item -Path (Join-Path $MsixDirectory "*") -Destination $tempAppDir -Recurse -Force
         Get-ChildItem -Path $tempAppDir -Recurse | Select-Object FullName, Mode | Format-Table -AutoSize | Out-String | Write-Host
         Get-ChildItem -Path $MsixDirectory -Recurse | Select-Object FullName, Mode | Format-Table -AutoSize | Out-String | Write-Host
 
