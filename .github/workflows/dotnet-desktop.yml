@@ -87,15 +87,14 @@ jobs:
         $msbuildOutput = msbuild $msbuildArgs | Out-String
         Write-Host "MSBuild Output:"; Write-Host $msbuildOutput
         try {
-            # Attempt to parse specific lines if JSON fails
-            $msixPathLine = $msbuildOutput | Select-String -Pattern '^\s*AppxPackageOutput\s*=\s*(.+)$'
-            $appVersionLine = $msbuildOutput | Select-String -Pattern '^\s*AppxManifestIdentityVersion\s*=\s*(.+)$'
-
-            $msixPath = $msixPathLine.Matches[0].Groups[1].Value.Trim()
-            $appVersion = $appVersionLine.Matches[0].Groups[1].Value.Trim()
-
-            if (-not $msixPath -or -not $appVersion) { Write-Error "Failed to parse MSIX Path or App Version from MSBuild output."; exit 1 }
-
+            $buildProps = $msbuildOutput | ConvertFrom-Json -ErrorAction Stop
+            # Extract the specific properties
+            $msixPath = $buildProps.Properties.AppxPackageOutput
+            $appVersion = $buildProps.Properties.AppxManifestIdentityVersion
+            if (-not $msixPath -or -not $appVersion) {
+                Write-Error "Failed to parse required properties (AppxPackageOutput, AppxManifestIdentityVersion) from MSBuild JSON output."
+                exit 1
+            }
             $projectRelativeDir = Split-Path '${{ env.Project_Path }}' # Gets "SupportHubApp" from "SupportHubApp\SupportHubApp.csproj"
             $projectFullPath = Join-Path $env:GITHUB_WORKSPACE $projectRelativeDir
             $msixAbsolutePath = Join-Path $projectFullPath $msixPath
