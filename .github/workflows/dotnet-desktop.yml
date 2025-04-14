@@ -239,6 +239,10 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: ${{ needs.build_and_package.outputs.source_bundle_path }}
+      - name: List Contents
+        run: |
+          echo "Contents:"
+          ls -R "${{ steps.dl-bundle.outputs.download-path }}"
       - name: Markdown to PDF and HTML
         uses: BaileyJM02/markdown-to-pdf@v1
         with:
