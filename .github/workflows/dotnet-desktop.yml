@@ -4,9 +4,11 @@ name: WinUI 3 MSIX Build and Intune Package
 
 on:
   push:
-    branches: [ "master" ] # Or your primary branch
+    tags:
+      - 'v*'
   pull_request:
-    branches: [ "master" ] # Or your primary branch
+    branches:
+      - "master"     # Runs on PRs targeting the 'master' branch
 
 jobs:
   build_and_package: # Combined job name for clarity
