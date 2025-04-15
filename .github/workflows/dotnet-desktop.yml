@@ -270,8 +270,8 @@ jobs:
         - name: Zip Output Bundle Contents
           # This step runs after markdown rendering, so PDF/HTML are included
           run: |
-            ls -R
-            ls -r renders
+            # Copy ./renders/* to the output bundle directory
+            cp -r renders/* dl-output-bundle/
             # Define the output zip filename (using tag name for uniqueness)
             zip_filename="SupportHub_IntunePackage_Bundle_${{ github.ref_name }}.zip"
             echo "Creating zip archive: ${zip_filename}"
