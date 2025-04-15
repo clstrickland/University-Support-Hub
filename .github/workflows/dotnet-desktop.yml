@@ -226,40 +226,84 @@ jobs:
         name: ${{ steps.package_intune_app.outputs.source_bundle_path }}
         path: ${{ steps.package_intune_app.outputs.source_bundle_path }}
 
-  render_markdown:
-    runs-on: ubuntu-latest
-    name: render_markdown
-    needs: build_and_package
-    steps:
-      - name: Download Intune Package Bundle artifact
-        id: dl-bundle
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.build_and_package.outputs.output_bundle_path }}
-          path: dl-bundle
-      - name: Download Intune Source Bundle artifact
-        id: dl-bundle-src
-        uses: actions/download-artifact@v4
-        with:
-          name: ${{ needs.build_and_package.outputs.source_bundle_path }}
-          path: dl-bundle-src
-      - name: List Contents
-        run: |
-          echo "Contents:"
-          ls -R "${{ steps.dl-bundle.outputs.download-path }}"
-      - name: Markdown to PDF and HTML
-        uses: BaileyJM02/markdown-to-pdf@v1
-        with:
-          input_path: "dl-bundle/INSTRUCTIONS.md"
-          output_dir: "dl-bundle"
-          build_html: true
-          build_pdf: true
-          table_of_contents: false
-      - name: Release
-        uses: softprops/action-gh-release@v2
-        if: github.ref_type == 'tag'
-        with:
-          files: |
-            "${{ needs.build_and_package.outputs.output_bundle_path }}"
-            "${{ needs.build_and_package.outputs.source_bundle_path }}"
-  
+  render_markdown_and_release:
+      runs-on: ubuntu-latest
+      name: Render Markdown & Release
+      needs: build_and_package
+      permissions:
+        contents: write # Keep this permission
+      steps:
+        # --- Download Steps ---
+        - name: Download Intune Output Bundle artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.build_and_package.outputs.output_bundle_path }} # Adjust if artifact name differs from path name
+            path: dl-output-bundle # Download to specific dir
+
+        - name: Download Intune Source Bundle artifact
+          uses: actions/download-artifact@v4
+          with:
+            name: ${{ needs.build_and_package.outputs.source_bundle_path }} # Adjust if artifact name differs from path name
+            path: dl-source-bundle # Download to specific dir
+
+        # --- Debugging Step (Optional but Recommended) ---
+        - name: List Contents Before Zipping (Debug)
+          run: |
+            echo "Output Bundle Contents (in dl-output-bundle/):"
+            ls -R dl-output-bundle
+            echo "Source Bundle Contents (in dl-source-bundle/):"
+            ls -R dl-source-bundle
+
+        # --- Markdown Rendering Step ---
+        - name: Markdown to PDF and HTML
+          uses: BaileyJM02/markdown-to-pdf@v1
+          with:
+            input_path: "dl-output-bundle/INSTRUCTIONS.md"
+            output_dir: "dl-output-bundle" # Output PDF/HTML into the bundle dir
+            build_html: true
+            build_pdf: true
+            table_of_contents: false
+
+        # --- Zipping Steps ---
+        - name: Zip Output Bundle Contents
+          # This step runs after markdown rendering, so PDF/HTML are included
+          run: |
+            # Define the output zip filename (using tag name for uniqueness)
+            zip_filename="SupportHub_IntunePackage_Bundle_${{ github.ref_name }}.zip"
+            echo "Creating zip archive: ${zip_filename}"
+            # Go into the directory containing the bundle contents
+            cd dl-output-bundle
+            # Create the zip file in the parent directory (workspace root) containing all files (.) inside the current directory
+            zip -r "../${zip_filename}" .
+            # Go back to the workspace root
+            cd ..
+            echo "OUTPUT_BUNDLE_ZIP=${zip_filename}" >> $GITHUB_ENV # Optional: Store filename in env var
+
+        - name: Zip Source Bundle Contents
+          run: |
+            # Define the output zip filename (using tag name for uniqueness)
+            zip_filename="SupportHub_IntunePackage_Source_Bundle_${{ github.ref_name }}.zip"
+            echo "Creating zip archive: ${zip_filename}"
+            # Go into the directory containing the source bundle contents
+            cd dl-source-bundle
+            # Create the zip file in the parent directory (workspace root) containing all files (.) inside the current directory
+            zip -r "../${zip_filename}" .
+            # Go back to the workspace root
+            cd ..
+            echo "SOURCE_BUNDLE_ZIP=${zip_filename}" >> $GITHUB_ENV # Optional: Store filename in env var
+
+        # --- Release Step ---
+        - name: Release
+          uses: softprops/action-gh-release@v2
+          if: github.ref_type == 'tag'
+          with:
+            # List the zip files created in the previous steps
+            files: |
+              SupportHub_IntunePackage_Bundle_${{ github.ref_name }}.zip
+              SupportHub_IntunePackage_Source_Bundle_${{ github.ref_name }}.zip
+            # Body still comes from the unzipped instructions file
+            body_path: "dl-output-bundle/INSTRUCTIONS.md"
+            # Other options can remain the same
+            # name: Release ${{ github.ref_name }}
+            # draft: false
+            # prerelease: false
