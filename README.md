@@ -18,7 +18,7 @@ The application runs discreetly in the system tray and provides:
 
 ## Documentation
 
-You can find more information on this project in the [wiki](wiki).
+You can find more information on this project in the [wiki](../../wiki).
 
 ## Technology Stack
 
